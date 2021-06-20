@@ -6,7 +6,7 @@ import {SlashCommandAPIGatewayEvent} from '@domain/slack';
 import {openKickoffModal} from './usecases/open-kickoff-modal';
 
 export const handler: Handler = async (event: SlashCommandAPIGatewayEvent, context) => {
-	logger.withRequest(event, context);
-	await slackAuthenticate(event);
-	return await openKickoffModal(event.body);
+  logger.withRequest(event, context);
+  await slackAuthenticate(event);
+  return await openKickoffModal(event.body);
 };
