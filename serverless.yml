@@ -27,15 +27,15 @@ provider:
 
 functions:
   open-kickoff:
-    handler: src/handlers/open-kickoff/handler.handler
+    handler: src/functions/open-kickoff/handler.handler
     events:
       - http:
           method: POST
           path: /kickoff
           async: true # This enables us to tell Slack we received the message without needing to respond via a lambda     
-  submit-kickoff:
-    handler: src/handlers/create-kickoff/handler.handler 
-    events:
-      - http:
-          method: POST
-          path: /submit-kickoff
+  # submit-kickoff:
+  #   handler: src/handlers/create-kickoff/handler.handler 
+  #   events:
+  #     - http:
+  #         method: POST
+  #         path: /submit-kickoff
