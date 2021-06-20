@@ -1,15 +1,41 @@
-service: aws-node-project
+service: kickoff
 
 frameworkVersion: '2'
 
 plugins:
   - serverless-esbuild
+  - serverless-offline
+
+useDotenv: true
+
+variablesResolutionMode: 20210326
+
+package:
+  individually: true
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   lambdaHashingVersion: 20201221
+  region: ap-southeast-2
+  environment:
+    LOG_LEVEL: ${env:LOG_LEVEL}
+    ENV: ${env:ENV}
+    SLACK_TOKEN: ${env:SLACK_TOKEN}
+    SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
+    NODE_TLS_REJECT_UNAUTHORIZED: ${env:NODE_TLS_REJECT_UNAUTHORIZED}
 
 functions:
-  hello:
-    handler: src/handlers/handler.hello
+  open-kickoff:
+    handler: src/handlers/open-kickoff/handler.handler
+    events:
+      - http:
+          method: POST
+          path: /kickoff
+          async: true # This enables us to tell Slack we received the message without needing to respond via a lambda     
+  submit-kickoff:
+    handler: src/handlers/create-kickoff/handler.handler 
+    events:
+      - http:
+          method: POST
+          path: /submit-kickoff
