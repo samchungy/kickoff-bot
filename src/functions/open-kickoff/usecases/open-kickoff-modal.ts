@@ -1,14 +1,15 @@
-import {logger} from '@lib';
-import {SlashCommand} from '@domain/slack';
-import {fetchUserInfo, openModal, sendPrivateMessage, updateModal} from 'infrastructure/http/slackClient';
-import {View} from '@slack/types';
+import {logger} from 'lib';
+import {SlackView, SlashCommand} from 'domain/slack';
+import {fetchUserInfo, openModal, sendMessage, updateModal} from 'infrastructure/slackInterface';
 import {add, roundToNearestMinutes} from 'date-fns';
 import {format} from 'date-fns-tz';
 
 import {config} from '../config';
+import {KickoffBlockId, KickoffMetadata} from 'domain/kickoff-modal';
 
 const openEmptyKickoffModal = async (triggerId: string): Promise<string> => {
-  const view: View = {
+  const view: SlackView<undefined> = {
+    callback_id: 'kickoff',
     title: {
       type: 'plain_text',
       text: 'Create a Kickoff',
@@ -56,7 +57,10 @@ const getNextAvailableTime = () => {
     return nextAvailableTime;
   }
 
-  return add(nextAvailableTime, {minutes: config.roundToNearestMinutes});
+  // Makes sure that the next time slot is used if the rounded time
+  return roundToNearestMinutes(add(nextAvailableTime, {minutes: config.roundToNearestMinutes}), {
+    nearestTo: config.roundToNearestMinutes,
+  });
 };
 
 const updateKickoffModal = async (viewId: string, timezone: TimezoneInfo) => {
@@ -65,7 +69,13 @@ const updateKickoffModal = async (viewId: string, timezone: TimezoneInfo) => {
   const initialTime = format(initialDateTime, 'HH:mm', {timeZone: timezone.tz});
   const timezoneString = `(UTC ${format(initialDateTime, 'xxx', {timeZone: timezone.tz})}) ${timezone.tz}`;
 
-  const view: View = {
+  const metadata: KickoffMetadata = {
+    timezone: timezone.tz,
+  };
+
+  const view: SlackView<KickoffBlockId> = {
+    callback_id: 'kickoff',
+    private_metadata: JSON.stringify(metadata),
     title: {
       type: 'plain_text',
       text: 'Create a Kickoff',
@@ -81,6 +91,7 @@ const updateKickoffModal = async (viewId: string, timezone: TimezoneInfo) => {
     },
     blocks: [
       {
+        block_id: 'channelId',
         type: 'input',
         label: {
           type: 'plain_text',
@@ -99,10 +110,11 @@ const updateKickoffModal = async (viewId: string, timezone: TimezoneInfo) => {
             text: 'Select a channel',
             emoji: true,
           },
-          action_id: 'static_select-action',
+          action_id: 'channel',
         },
       },
       {
+        block_id: 'description',
         type: 'input',
         label: {
           type: 'plain_text',
@@ -118,11 +130,12 @@ const updateKickoffModal = async (viewId: string, timezone: TimezoneInfo) => {
         elements: [
           {
             type: 'mrkdwn',
-            text: `All dates and times are set according to the timezone set in your Slack profile.\n*Your timezone*: ${timezoneString}`,
+            text: `All dates and times are set according to the timezone listed in your Slack profile.\n*Your timezone*: ${timezoneString}`,
           },
         ],
       },
       {
+        block_id: 'date',
         type: 'input',
         label: {
           type: 'plain_text',
@@ -135,7 +148,7 @@ const updateKickoffModal = async (viewId: string, timezone: TimezoneInfo) => {
             type: 'plain_text',
             text: 'Select a date',
           },
-          action_id: 'datepicker-action',
+          action_id: 'date',
         },
       },
       {
@@ -183,7 +196,7 @@ const openKickoffModal = async (command: SlashCommand) => {
     await updateKickoffModal(viewId, timezoneInfo);
   } catch (error) {
     logger.error(error, 'Failed to open a kickoff modal');
-    return sendPrivateMessage(userId, ':white_frowning_face: Something went wrong! Please try again');
+    return sendMessage(userId, ':white_frowning_face: Something went wrong! Please try again');
   }
 };
 

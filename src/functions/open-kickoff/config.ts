@@ -1,6 +1,6 @@
 const config = {
   // The minimum notify time before for a new kickoff
-  minimumNotifyMinutesBeforeKickoff: 10,
+  minimumNotifyMinutesBeforeKickoff: 15,
   // Nearest number of minutes to round to. E.g. 15 to round to quarter hours
   roundToNearestMinutes: 15,
 };
