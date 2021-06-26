@@ -1,9 +1,11 @@
-import {config, logger} from '@lib';
+import {logger} from 'lib';
 import crypto from 'crypto';
-import {SlashCommandAPIGatewayEvent} from '@domain/slack';
+import {SlashCommandAPIGatewayEvent} from 'domain/slack';
+import {APIGatewayEvent} from 'aws-lambda';
+import {config} from 'config';
 
 interface SlackAuthenticator {
-  (event: SlashCommandAPIGatewayEvent): Promise<void>;
+  (event: SlashCommandAPIGatewayEvent | APIGatewayEvent): Promise<void>;
 }
 
 const slackAuthenticate: SlackAuthenticator = async event => {
