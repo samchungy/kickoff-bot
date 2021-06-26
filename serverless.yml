@@ -13,6 +13,13 @@ variablesResolutionMode: 20210326
 package:
   individually: true
 
+custom:
+  prefix: ${service}-${sls:stage}
+  esbuild:
+    bundle: true
+    minify: false
+
+
 provider:
   name: aws
   runtime: nodejs14.x
@@ -24,8 +31,16 @@ provider:
     SLACK_TOKEN: ${env:SLACK_TOKEN}
     SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
     NODE_TLS_REJECT_UNAUTHORIZED: ${env:NODE_TLS_REJECT_UNAUTHORIZED}
+    PREFIX: ${self:custom.prefix}
 
 functions:
+  # Slack
+  slack-actions:
+    handler: src/functions/slack-actions/handler.handler 
+    events:
+      - http:
+          method: POST
+          path: /slack-actions
   open-kickoff:
     handler: src/functions/open-kickoff/handler.handler
     events:
@@ -33,9 +48,5 @@ functions:
           method: POST
           path: /kickoff
           async: true # This enables us to tell Slack we received the message without needing to respond via a lambda     
-  # submit-kickoff:
-  #   handler: src/handlers/create-kickoff/handler.handler 
-  #   events:
-  #     - http:
-  #         method: POST
-  #         path: /submit-kickoff
+  post-kickoff:
+    handler: src/functions/post-kickoff/handler.handler

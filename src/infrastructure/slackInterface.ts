@@ -1,5 +1,7 @@
 import {ErrorCode, View, WebClient} from '@slack/web-api';
-import {config, logger} from '@lib';
+import {logger} from 'lib';
+import {config} from 'config';
+import {SlackBlocks} from 'domain/slack';
 
 const client = new WebClient(config.slack.token);
 
@@ -53,12 +55,13 @@ const fetchUserInfo = async (userId: string) => {
   }
 };
 
-const sendEphemeralMessage = async (userId: string, channelId: string, message: string) => {
+const sendEphemeralMessage = async (userId: string, channelId: string, message: string, blocks?: SlackBlocks) => {
   try {
     return await client.chat.postEphemeral({
       channel: channelId,
       user: userId,
       text: message,
+      blocks,
     });
   } catch (error) {
     if (error.code === ErrorCode.PlatformError) {
@@ -71,21 +74,22 @@ const sendEphemeralMessage = async (userId: string, channelId: string, message: 
   }
 };
 
-const sendPrivateMessage = async (userId: string, message: string) => {
+const sendMessage = async (sendTo: string, message: string, blocks?: SlackBlocks) => {
   try {
     return await client.chat.postMessage({
-      channel: userId,
+      channel: sendTo,
       text: message,
+      blocks,
     });
   } catch (error) {
     if (error.code === ErrorCode.PlatformError) {
-      logger.error(error.data, 'Failed to send private message in Slack');
+      logger.error(error.data, 'Failed to send message in Slack');
     } else {
-      logger.error(error, 'Failed to send private message in Slack');
+      logger.error(error, 'Failed to send message in Slack');
     }
 
     throw error;
   }
 };
 
-export {fetchUserInfo, openModal, sendEphemeralMessage, updateModal, sendPrivateMessage};
+export {fetchUserInfo, openModal, sendEphemeralMessage, updateModal, sendMessage};
