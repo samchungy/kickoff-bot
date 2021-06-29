@@ -5,7 +5,13 @@ import {submitKickoffModal} from './usecases/submit-kickoff-modal';
 const viewSubmissionHandler = (payload: SlackViewAction) => {
   switch (payload.view.callback_id) {
     case 'kickoff': {
-      return submitKickoffModal(payload.view.state.values, payload.team?.id as string, payload.view.id, payload.user.id, payload.view.private_metadata);
+      return submitKickoffModal({
+        values: payload.view.state.values,
+        teamId: payload.team?.id as string,
+        viewId: payload.view.id,
+        userId: payload.user.id,
+        metadata: payload.view.private_metadata,
+      });
     }
 
     default: {

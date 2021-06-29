@@ -2,7 +2,7 @@ import pino, {PinoLambdaLogger} from 'pino-lambda';
 
 const logger: PinoLambdaLogger = pino({
   level: process.env.LOG_LEVEL || '',
-  ...(process.env.ENV === 'local' && {
+  ...(process.env.NODE_ENV === 'local' && {
     prettyPrint: {colorize: true, translateTime: 'SYS:'},
   }),
 });

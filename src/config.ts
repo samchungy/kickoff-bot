@@ -13,7 +13,7 @@ const config = {
     opts: {
       endpoint: process.env.DYNAMODB_ENDPOINT,
     },
-    tableName: process.env.DYNAMODB_TABLE_NAME || '',
+    tableName: process.env.KICKOFF_TABLE || '',
     prefixes: {
       date: 'date-',
     },

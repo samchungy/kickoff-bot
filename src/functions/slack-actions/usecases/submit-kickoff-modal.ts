@@ -1,3 +1,4 @@
+import {zonedTimeToUtc} from 'date-fns-tz';
 import {PostKickoffEvent} from 'domain/events';
 import {KickoffBlockId, KickoffMetadata, KickoffValues} from 'domain/kickoff-modal';
 import {SlackViewValues} from 'domain/slack';
@@ -47,11 +48,20 @@ const extractValues = (values: SlackViewValues<KickoffBlockId, KickoffBlockId>) 
   return extractedValues;
 }, {} as KickoffValues);
 
-const verifyValues = (values: KickoffValues) => Object.entries(values).reduce((errors, [key, value]) => {
+const verifyValues = (values: KickoffValues, timezone: string) => Object.entries(values).reduce((errors, [key, value]) => {
   switch (key as KickoffBlockId) {
     case 'zoom': {
       if (!urlPattern.test(value)) {
         errors[key as KickoffBlockId] = 'Please enter a valid URL';
+      }
+
+      break;
+    }
+
+    case 'date': {
+      if (zonedTimeToUtc(`${value} ${values.time}`, timezone) < new Date()) {
+        errors.date = 'Please enter a date and time greater than the current date';
+        errors.time = 'Please enter a date and time greater than the current date';
       }
 
       break;
@@ -65,11 +75,17 @@ const verifyValues = (values: KickoffValues) => Object.entries(values).reduce((e
   return errors;
 }, {} as KickoffValues);
 
-const submitKickoffModal = async (values: SlackViewValues<KickoffBlockId, KickoffBlockId>, teamId: string, viewId: string, userId: string, metadata: string) => {
-  const extractedMetadata = extractMetadata(metadata);
-  const extractedValues = extractValues(values);
-  const errors = verifyValues(extractedValues);
-  if (Object.keys(errors).length > 0) {
+const submitKickoffModal = async (modal: {
+  values: SlackViewValues<KickoffBlockId, KickoffBlockId>,
+  teamId: string,
+  viewId: string,
+  userId: string,
+  metadata: string
+}) => {
+  const extractedMetadata = extractMetadata(modal.metadata);
+  const extractedValues = extractValues(modal.values);
+  const errors = verifyValues(extractedValues, extractedMetadata.timezone);
+  if (Object.keys(errors).length) {
     return JSON.stringify({
       response_action: 'errors',
       errors,
@@ -79,9 +95,9 @@ const submitKickoffModal = async (values: SlackViewValues<KickoffBlockId, Kickof
   const payload: PostKickoffEvent = {
     ...extractedValues,
     ...extractedMetadata,
-    teamId,
-    viewId,
-    userId,
+    teamId: modal.teamId,
+    viewId: modal.viewId,
+    userId: modal.userId,
   };
 
   await invokeAsync('post-kickoff', {...payload});

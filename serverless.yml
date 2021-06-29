@@ -4,9 +4,8 @@ frameworkVersion: '2'
 
 plugins:
   - serverless-esbuild
+  - serverless-dynamodb-local
   - serverless-offline
-
-useDotenv: true
 
 variablesResolutionMode: 20210326
 
@@ -14,10 +13,17 @@ package:
   individually: true
 
 custom:
-  prefix: ${service}-${sls:stage}
+  prefix: ${self:service}-${sls:stage}
   esbuild:
     bundle: true
     minify: false
+  dynamodb:
+    stages:
+      - local
+    start:
+      port: 8000
+      dbPath: .dynamodb
+      migrate: true
 
 
 provider:
@@ -26,12 +32,15 @@ provider:
   lambdaHashingVersion: 20201221
   region: ap-southeast-2
   environment:
-    LOG_LEVEL: ${env:LOG_LEVEL}
-    ENV: ${env:ENV}
+    LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+    NODE_ENV: ${env:NODE_ENV, 'production'}
     SLACK_TOKEN: ${env:SLACK_TOKEN}
     SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
     NODE_TLS_REJECT_UNAUTHORIZED: ${env:NODE_TLS_REJECT_UNAUTHORIZED}
-    PREFIX: ${self:custom.prefix}
+    PREFIX: ${self:custom.prefix}-
+    LAMBDA_ENDPOINT: ${env:LAMBDA_ENDPOINT}
+    DYNAMODB_ENDPOINT: ${env:DYNAMODB_ENDPOINT}
+    KICKOFF_TABLE: ${self:custom.prefix}
 
 functions:
   # Slack
@@ -50,3 +59,25 @@ functions:
           async: true # This enables us to tell Slack we received the message without needing to respond via a lambda     
   post-kickoff:
     handler: src/functions/post-kickoff/handler.handler
+
+resources:
+  Resources:
+    KickoffTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        BillingMode: 'PAY_PER_REQUEST'
+        AttributeDefinitions:
+          - AttributeName: hashKey
+            AttributeType: S
+          - AttributeName: rangeKey
+            AttributeType: S
+        KeySchema:
+          - AttributeName: hashKey
+            KeyType: HASH
+          - AttributeName: rangeKey
+            KeyType: RANGE
+        TableName: ${self:provider.environment.KICKOFF_TABLE}
+        TimeToLiveSpecification:
+            AttributeName: ttl
+            Enabled: true

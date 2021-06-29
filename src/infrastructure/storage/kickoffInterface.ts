@@ -9,7 +9,7 @@ const createHashKey = (teamId: string, channelId: string) => `${teamId}-${channe
 const putKickoff = async (teamId: string, channelId: string, viewId: string, kickoff: PostKickoffEvent): Promise<KickoffItem> => {
   const item: KickoffItem = {
     hashKey: createHashKey(teamId, channelId),
-    sortKey: viewId,
+    rangeKey: viewId,
     ...kickoff,
   };
   await client.send(new PutCommand({

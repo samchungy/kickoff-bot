@@ -1,7 +1,7 @@
 import {getUnixTime} from 'date-fns';
 import {format, zonedTimeToUtc} from 'date-fns-tz';
 import {PostKickoffEvent} from 'domain/events';
-import {RetryKickoffBlocks} from 'domain/kickoff';
+import {RetryKickoffBlock} from 'domain/kickoff';
 import {SlackBlocks} from 'domain/slack';
 import {sendMessage} from 'infrastructure/slackInterface';
 import {putKickoff} from 'infrastructure/storage/kickoffInterface';
@@ -10,11 +10,11 @@ import {logger} from 'lib';
 const getDateString = (timezone: string, date: string, time: string) => {
   const kickoffDate = zonedTimeToUtc(`${date} ${time}`, timezone);
   const backupTime = format(kickoffDate, 'yyyy-MM-dd hh:mmaaa zzzz', {timeZone: timezone});
-  return `<!date^${getUnixTime(kickoffDate)}^{date_short_pretty} - ^{time}|${backupTime}}>`;
+  return `<!date^${getUnixTime(kickoffDate)}^{date_short_pretty} - {time}|${backupTime}>`;
 };
 
 const createSlackPost = async (event: PostKickoffEvent) => {
-  const text = `<@${event.userId}> is kicking off *${event.description} * at *${getDateString(event.timezone, event.date, event.time)}*`;
+  const text = `<@${event.userId}> is kicking off *${event.description} * at ${getDateString(event.timezone, event.date, event.time)}`;
   const blocks: SlackBlocks = [
     {
       type: 'section',
@@ -44,37 +44,40 @@ const createSlackPost = async (event: PostKickoffEvent) => {
 };
 
 const handlePermissionError = async (event: PostKickoffEvent) => {
-  await putKickoff(event.teamId, event.channelId, event.viewId, event);
-
-  const text = `:information_source: Failed to post a kickoff to <#${event.channelId}>. Please run \`/invite @kickoff\` in the channel and click the retry button below.`;
-  const value = {
-    channelId: event.channelId,
-    viewId: event.viewId,
-  };
-  const blocks: RetryKickoffBlocks = [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text,
-      },
-    },
-    {
-      type: 'actions',
-      elements: [
-        {
-          type: 'button',
-          text: {
-            type: 'plain_text',
-            text: 'Retry',
-          },
-          value: JSON.stringify(value),
-          action_id: 'retry',
+  try {
+    await putKickoff(event.teamId, event.channelId, event.viewId, event);
+    const text = `:information_source: Failed to post a kickoff to <#${event.channelId}>. Please run \`/invite @kickoff\` in the channel and click the retry button below.`;
+    const value = {
+      channelId: event.channelId,
+      viewId: event.viewId,
+    };
+    const blocks: RetryKickoffBlock[] = [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text,
         },
-      ],
-    },
-  ];
-  return sendMessage(event.userId, text, blocks);
+      },
+      {
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            text: {
+              type: 'plain_text',
+              text: 'Retry',
+            },
+            value: JSON.stringify(value),
+            action_id: 'retry',
+          },
+        ],
+      },
+    ];
+    return sendMessage(event.userId, text, blocks);
+  } catch (error) {
+    logger.error(error, 'Failed to send post kickoff retry to user');
+  }
 };
 
 const postKickoff = async (event: PostKickoffEvent) => {

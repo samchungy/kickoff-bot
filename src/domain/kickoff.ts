@@ -1,14 +1,14 @@
 import {PostKickoffEvent} from './events';
-import {SlackActionsBlocks} from './slack';
+import {SlackBlockWithAction} from './slack';
 
 interface KickoffItem extends PostKickoffEvent {
   hashKey: string
-  sortKey: string
+  rangeKey: string
 }
 
-type RetryKickoffBlocks = SlackActionsBlocks<'retry'>
+type RetryKickoffBlock = SlackBlockWithAction<'retry'>
 
 export {
   KickoffItem,
-  RetryKickoffBlocks,
+  RetryKickoffBlock,
 };
