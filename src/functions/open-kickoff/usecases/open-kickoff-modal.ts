@@ -8,7 +8,7 @@ import {config} from '../config';
 import {KickoffBlockId, KickoffMetadata} from 'domain/kickoff-modal';
 
 const openEmptyKickoffModal = async (triggerId: string): Promise<string> => {
-  const view: SlackView<undefined> = {
+  const view: SlackView<undefined, undefined> = {
     callback_id: 'kickoff',
     title: {
       type: 'plain_text',
@@ -73,7 +73,7 @@ const updateKickoffModal = async (viewId: string, timezone: TimezoneInfo) => {
     timezone: timezone.tz,
   };
 
-  const view: SlackView<KickoffBlockId> = {
+  const view: SlackView<KickoffBlockId, KickoffBlockId> = {
     callback_id: 'kickoff',
     private_metadata: JSON.stringify(metadata),
     title: {
@@ -110,7 +110,7 @@ const updateKickoffModal = async (viewId: string, timezone: TimezoneInfo) => {
             text: 'Select a channel',
             emoji: true,
           },
-          action_id: 'channel',
+          action_id: 'channelId',
         },
       },
       {
@@ -123,6 +123,7 @@ const updateKickoffModal = async (viewId: string, timezone: TimezoneInfo) => {
         element: {
           type: 'plain_text_input',
           multiline: true,
+          action_id: 'description',
         },
       },
       {
@@ -152,6 +153,7 @@ const updateKickoffModal = async (viewId: string, timezone: TimezoneInfo) => {
         },
       },
       {
+        block_id: 'time',
         type: 'input',
         label: {
           type: 'plain_text',
@@ -164,10 +166,11 @@ const updateKickoffModal = async (viewId: string, timezone: TimezoneInfo) => {
             type: 'plain_text',
             text: 'Select time',
           },
-          action_id: 'timepicker-action',
+          action_id: 'time',
         },
       },
       {
+        block_id: 'zoom',
         type: 'input',
         label: {
           type: 'plain_text',
@@ -175,7 +178,7 @@ const updateKickoffModal = async (viewId: string, timezone: TimezoneInfo) => {
         },
         element: {
           type: 'plain_text_input',
-          action_id: 'plain_text_input-action',
+          action_id: 'zoom',
         },
       },
     ],
