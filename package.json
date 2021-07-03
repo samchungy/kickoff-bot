@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@aws-sdk/types": "3.18",
+    "@aws-sdk/types": "3.18.0",
     "@slack/bolt": "3.4.0",
     "@slack/types": "2.1.0",
     "@types/aws-lambda": "8.10.77",
