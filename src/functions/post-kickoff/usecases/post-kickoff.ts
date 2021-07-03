@@ -1,7 +1,7 @@
 import {ChatPostMessageResponse} from '@slack/web-api';
 import {getUnixTime} from 'date-fns';
 import {format, zonedTimeToUtc} from 'date-fns-tz';
-import {PostKickoffEvent} from 'domain/events';
+import {KickoffEvent} from 'domain/events';
 import {RetryKickoffBlock} from 'domain/kickoff';
 import {SlackBlocks} from 'domain/slack';
 import {invokeAsync} from 'infrastructure/lambda-Interface';
@@ -15,7 +15,7 @@ const getDateString = (timezone: string, date: string, time: string) => {
   return `<!date^${getUnixTime(kickoffDate)}^{date_short_pretty} - {time}|${backupTime}>`;
 };
 
-const handlePermissionError = async (event: PostKickoffEvent) => {
+const handlePermissionError = async (event: KickoffEvent) => {
   try {
     const text = `:information_source: Failed to post a kickoff to <#${event.channelId}>. Please run \`/invite @kickoff\` in the channel and click the retry button below.`;
     const blocks: RetryKickoffBlock[] = [
@@ -47,7 +47,7 @@ const handlePermissionError = async (event: PostKickoffEvent) => {
   }
 };
 
-const createSlackPost = async (event: PostKickoffEvent) => {
+const createSlackPost = async (event: KickoffEvent) => {
   const text = `<@${event.userId}> is kicking off *${event.description} * at *${getDateString(event.timezone, event.date, event.time)}*`;
   const blocks: SlackBlocks = [
     {
@@ -83,12 +83,12 @@ const createSlackPost = async (event: PostKickoffEvent) => {
   }
 };
 
-const storeKickoff = async (event: PostKickoffEvent, metadata: ChatPostMessageResponse) => {
+const storeKickoff = async (event: KickoffEvent, metadata: ChatPostMessageResponse) => {
   const time = zonedTimeToUtc(`${event.date} ${event.time}`, event.timezone).getTime() / 1000;
   await putKickoff(event.channelId, metadata.ts as string, time, event.userId);
 };
 
-const postKickoff = async (event: PostKickoffEvent) => {
+const postKickoff = async (event: KickoffEvent) => {
   try {
     const metadata = await createSlackPost(event);
     await storeKickoff(event, metadata);

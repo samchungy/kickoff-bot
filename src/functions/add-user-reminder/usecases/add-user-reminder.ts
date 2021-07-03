@@ -1,4 +1,4 @@
-import {AddUserReminderEvent} from 'domain/events';
+import {UserReminderEvent} from 'domain/events';
 import {SlackBlocks} from 'domain/slack';
 import {deleteScheduledMessage, scheduleMessage} from 'infrastructure/slack-interface';
 import {addKickoffUser, getKickoff} from 'infrastructure/storage/kickoff-interface';
@@ -7,8 +7,9 @@ import {config} from 'config';
 import {KickoffItem} from 'domain/kickoff';
 
 const addReminder = async (channelId: string, userId: string, ts: string, kickoff: KickoffItem) => {
-  const url = `https://${config.slack.domain}.com/archives/${channelId}/p${ts.replace('.', '')}`;
-  const text = `<@${kickoff.author}>'s kickoff is starting in 1 minute.\n\n${url}`;
+  const url = `https://${config.slack.domain}.slack.com/archives/${channelId}/p${ts.replace('.', '')}`;
+  const user = kickoff.author === userId ? 'Your' : `<@${kickoff.author}>'s`;
+  const text = `${user} kickoff is starting in 1 minute.\n\n${url}`;
   const blocks: SlackBlocks = [
     {
       type: 'section',
@@ -17,30 +18,15 @@ const addReminder = async (channelId: string, userId: string, ts: string, kickof
         text,
       },
     },
-    {
-      type: 'actions',
-      elements: [
-        {
-          type: 'button',
-          text: {
-            type: 'plain_text',
-            text: 'Join Zoom Meeting',
-            emoji: true,
-          },
-          style: 'primary',
-          url: `https://${config.slack.domain}.com/archives/${channelId}/p1625277172000800`,
-        },
-      ],
-    },
   ];
-  return await scheduleMessage(userId, kickoff.eventTime, text, blocks);
+  return await scheduleMessage(userId, kickoff.eventTime - 60, text, blocks);
 };
 
-const addUserReminder = async (event: AddUserReminderEvent) => {
+const addUserReminder = async (event: UserReminderEvent) => {
   const kickoff = await getKickoff(event.channelId, event.ts);
 
-  if (!kickoff || kickoff.users[event.userId]) {
-    logger.info({kickoff}, 'No kickoff or user already exists');
+  if (!kickoff || kickoff.users[event.userId] || kickoff.eventTime <= new Date().getTime() / 1000) {
+    logger.info({kickoff}, 'No kickoff, kickoff has expired or user already exists');
     return;
   }
 
@@ -51,8 +37,11 @@ const addUserReminder = async (event: AddUserReminderEvent) => {
   } catch (error) {
     if (error.name === 'ConditionalCheckFailedException') {
       // User already has a link, remove it.
-      await deleteScheduledMessage(event.userId, metadata.scheduled_message_id as string);
+      return await deleteScheduledMessage(event.userId, metadata.scheduled_message_id as string);
     }
+
+    logger.error(error, 'Failed to add kickoff user');
+    throw error;
   }
 };
 

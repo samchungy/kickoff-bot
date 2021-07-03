@@ -1,8 +1,8 @@
-import {PostKickoffEvent} from 'domain/events';
+import {KickoffEvent} from 'domain/events';
 import {KickoffMetadata} from 'domain/kickoff-modal';
 import {updateKickoffModal} from 'lib/kickoff/modal';
 
-const reopenKickoff = async (event: PostKickoffEvent) => {
+const reopenKickoff = async (event: KickoffEvent) => {
   const metadata: KickoffMetadata = {
     timezone: event.timezone,
   };

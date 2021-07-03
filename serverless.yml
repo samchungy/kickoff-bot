@@ -24,6 +24,8 @@ custom:
       port: 8000
       dbPath: .dynamodb
       migrate: true
+  serverless-offline:
+    useChildProcesses: true
 
 
 provider:
@@ -74,6 +76,8 @@ functions:
   # User reminders
   add-user-reminder:
     handler: src/functions/add-user-reminder/handler.handler
+  remove-user-reminder:
+    handler: src/functions/remove-user-reminder/handler.handler
 
 resources:
   Resources:
@@ -94,5 +98,5 @@ resources:
             KeyType: RANGE
         TableName: ${self:provider.environment.KICKOFF_TABLE}
         TimeToLiveSpecification:
-            AttributeName: ttl
+            AttributeName: eventTime
             Enabled: true

@@ -27,15 +27,31 @@ const addKickoffUser = async (channelId: string, ts: string, userId: string, mes
       rangeKey: createRangeKey(ts),
     },
     TableName: config.dynamodb.tableName,
-    ConditionExpression: 'attribute_not_exists(#user.#userId)',
+    ConditionExpression: 'attribute_not_exists(#users.#userId)',
     ExpressionAttributeValues: {
       ':messageId': messageId,
     },
     ExpressionAttributeNames: {
+      '#users': 'users',
+      '#userId': userId,
+    },
+    UpdateExpression: 'SET #users.#userId = :messageId',
+  }));
+};
+
+const removeKickoffUser = async (channelId: string, ts: string, userId: string) => {
+  await client.send(new UpdateCommand({
+    Key: {
+      hashKey: createHashKey(channelId),
+      rangeKey: createRangeKey(ts),
+    },
+    TableName: config.dynamodb.tableName,
+    ConditionExpression: 'attribute_exists(#user.#userId)',
+    ExpressionAttributeNames: {
       '#user': 'user',
       '#userId': userId,
     },
-    UpdateExpression: '#user.#userId = :messageId',
+    UpdateExpression: 'REMOVE #user.#userId',
   }));
 };
 
@@ -50,4 +66,4 @@ const getKickoff = async (channelId: string, ts: string) => {
   return payload.Item as KickoffItem | undefined;
 };
 
-export {addKickoffUser, getKickoff, putKickoff};
+export {addKickoffUser, getKickoff, putKickoff, removeKickoffUser};

@@ -1,5 +1,5 @@
 import {zonedTimeToUtc} from 'date-fns-tz';
-import {PostKickoffEvent} from 'domain/events';
+import {KickoffEvent} from 'domain/events';
 import {KickoffBlockId, KickoffMetadata, KickoffValues} from 'domain/kickoff-modal';
 import {SlackViewValues} from 'domain/slack';
 import {invokeAsync} from 'infrastructure/lambda-Interface';
@@ -91,7 +91,7 @@ const submitKickoffModal = async (modal: {
     });
   }
 
-  const payload: PostKickoffEvent = {
+  const payload: KickoffEvent = {
     ...extractedValues,
     ...extractedMetadata,
     viewId: modal.viewId,
