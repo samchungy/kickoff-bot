@@ -3,13 +3,14 @@ import {logger} from 'lib';
 import {config} from 'config';
 import {SlackBlocks} from 'domain/slack';
 
-const client = new WebClient(config.slack.token);
+const client = new WebClient();
 
 const openModal = async (triggerId: string, view: View) => {
   try {
     return await client.views.open({
       trigger_id: triggerId,
       view,
+      token: config.slack.token,
     });
   } catch (error) {
     if (error.code === ErrorCode.PlatformError) {
@@ -27,6 +28,7 @@ const updateModal = async (viewId: string, view: View) => {
     return await client.views.update({
       view_id: viewId,
       view,
+      token: config.slack.token,
     });
   } catch (error) {
     if (error.code === ErrorCode.PlatformError) {
@@ -43,6 +45,7 @@ const fetchUserInfo = async (userId: string) => {
   try {
     return await client.users.info({
       user: userId,
+      token: config.slack.token,
     });
   } catch (error) {
     if (error.code === ErrorCode.PlatformError) {
@@ -62,6 +65,7 @@ const sendEphemeralMessage = async (userId: string, channelId: string, message: 
       user: userId,
       text: message,
       blocks,
+      token: config.slack.token,
     });
   } catch (error) {
     if (error.code === ErrorCode.PlatformError) {
@@ -80,6 +84,7 @@ const sendMessage = async (sendTo: string, message: string, blocks?: SlackBlocks
       channel: sendTo,
       text: message,
       blocks,
+      token: config.slack.token,
     });
   } catch (error) {
     if (error.code === ErrorCode.PlatformError) {
@@ -92,4 +97,42 @@ const sendMessage = async (sendTo: string, message: string, blocks?: SlackBlocks
   }
 };
 
-export {fetchUserInfo, openModal, sendEphemeralMessage, updateModal, sendMessage};
+const scheduleMessage = async (sendTo: string, postAt: number, message: string, blocks?: SlackBlocks) => {
+  try {
+    return await client.chat.scheduleMessage({
+      channel: sendTo,
+      text: message,
+      blocks,
+      post_at: postAt,
+      token: config.slack.token,
+    });
+  } catch (error) {
+    if (error.code === ErrorCode.PlatformError) {
+      logger.error(error.data, 'Failed to schedule message in Slack');
+    } else {
+      logger.error(error, 'Failed to schedule message in Slack');
+    }
+
+    throw error;
+  }
+};
+
+const deleteScheduledMessage = async (sendTo: string, messageId: string) => {
+  try {
+    return await client.chat.deleteScheduledMessage({
+      channel: sendTo,
+      scheduled_message_id: messageId,
+      token: config.slack.token,
+    });
+  } catch (error) {
+    if (error.code === ErrorCode.PlatformError) {
+      logger.error(error.data, 'Failed to delete scheduled message in Slack');
+    } else {
+      logger.error(error, 'Failed to delete scheduled message in Slack');
+    }
+
+    throw error;
+  }
+};
+
+export {deleteScheduledMessage, fetchUserInfo, openModal, sendEphemeralMessage, updateModal, sendMessage, scheduleMessage};

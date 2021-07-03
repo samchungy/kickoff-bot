@@ -12,7 +12,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayEvent, co
   const eventBody = Object.fromEntries(new URLSearchParams(event.body as string).entries());
   const payload = JSON.parse(eventBody.payload) as SlackViewAction | SlackBlockAction;
 
-  const getResponse = () => {
+  const getResponse = async () => {
     switch (payload.type) {
       case 'view_submission': {
         return viewSubmissionHandler(payload);
@@ -23,7 +23,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayEvent, co
       }
 
       default: {
-        logger.warning({payload}, 'Unknown Action');
+        logger.warn({payload}, 'Unknown Action');
         break;
       }
     }

@@ -7,7 +7,6 @@ const viewSubmissionHandler = (payload: SlackViewAction) => {
     case 'kickoff': {
       return submitKickoffModal({
         values: payload.view.state.values,
-        teamId: payload.team?.id as string,
         viewId: payload.view.id,
         userId: payload.user.id,
         metadata: payload.view.private_metadata,

@@ -1,14 +1,28 @@
-import {PostKickoffEvent} from './events';
 import {SlackBlockWithAction} from './slack';
 
-interface KickoffItem extends PostKickoffEvent {
+type UserScheduledMessage = Record<string, string>
+
+interface KickoffItem {
   hashKey: string
   rangeKey: string
+  eventTime: number
+  author: string
+  users: UserScheduledMessage
 }
 
-type RetryKickoffBlock = SlackBlockWithAction<'retry'>
+type RetryKickoffActionId = 'retry'
+
+type RetryKickoffBlock = SlackBlockWithAction<RetryKickoffActionId>
+
+interface RetryKickoffValue {
+  channelId: string
+  viewId: string
+  kickoffDate: string
+}
 
 export {
   KickoffItem,
+  RetryKickoffActionId,
   RetryKickoffBlock,
+  RetryKickoffValue,
 };

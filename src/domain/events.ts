@@ -1,12 +1,18 @@
 import {KickoffValues} from './kickoff-modal';
 
-interface PostKickoffEvent extends KickoffValues {
+type PostKickoffEvent = KickoffValues & {
   viewId: string
-  teamId: string
   userId: string
   timezone: string
 }
 
+type AddUserReminderEvent = {
+  userId: string
+  channelId: string
+  ts: string
+}
+
 export {
+  AddUserReminderEvent,
   PostKickoffEvent,
 };

@@ -2,7 +2,7 @@ import {zonedTimeToUtc} from 'date-fns-tz';
 import {PostKickoffEvent} from 'domain/events';
 import {KickoffBlockId, KickoffMetadata, KickoffValues} from 'domain/kickoff-modal';
 import {SlackViewValues} from 'domain/slack';
-import {invokeAsync} from 'infrastructure/lambdaInterface';
+import {invokeAsync} from 'infrastructure/lambda-Interface';
 import {logger} from 'lib';
 
 const urlPattern = new RegExp('^(https?:\\/\\/)?' // Protocol
@@ -77,7 +77,6 @@ const verifyValues = (values: KickoffValues, timezone: string) => Object.entries
 
 const submitKickoffModal = async (modal: {
   values: SlackViewValues<KickoffBlockId, KickoffBlockId>,
-  teamId: string,
   viewId: string,
   userId: string,
   metadata: string
@@ -95,12 +94,11 @@ const submitKickoffModal = async (modal: {
   const payload: PostKickoffEvent = {
     ...extractedValues,
     ...extractedMetadata,
-    teamId: modal.teamId,
     viewId: modal.viewId,
     userId: modal.userId,
   };
 
-  await invokeAsync('post-kickoff', {...payload});
+  await invokeAsync({functionName: 'post-kickoff', payload});
 };
 
 export {
