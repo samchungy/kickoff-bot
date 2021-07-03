@@ -22,7 +22,7 @@
     "@typescript-eslint/parser": "4.27.0",
     "dotenv-cli": "4.0.0",
     "esbuild": "0.12.14",
-    "eslint": "7.29.0",
+    "eslint": "7.30.0",
     "eslint-config-xo": "0.37.0",
     "inquirer": "7.3.3",
     "pino-pretty": "5.0.2",
