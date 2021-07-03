@@ -1,4 +1,5 @@
 import {zonedTimeToUtc} from 'date-fns-tz';
+import {add} from 'date-fns';
 import {KickoffEvent} from 'domain/events';
 import {KickoffBlockId, KickoffMetadata, KickoffValues} from 'domain/kickoff-modal';
 import {SlackViewValues} from 'domain/slack';
@@ -59,9 +60,17 @@ const verifyValues = (values: KickoffValues, timezone: string) => Object.entries
     }
 
     case 'date': {
-      if (zonedTimeToUtc(`${value} ${values.time}`, timezone) < new Date()) {
+      const date = zonedTimeToUtc(`${value} ${values.time}`, timezone);
+      if (date < new Date()) {
         errors.date = 'Please enter a date and time greater than the current date';
         errors.time = 'Please enter a date and time greater than the current date';
+        break;
+      }
+
+      if (date >= add(date, {weeks: 2})) {
+        errors.date = 'Your date and time is too far in the future. Please enter a kickoff date and time less than 2 weeks away';
+        errors.time = 'Your date and time is too far in the future. Please enter a kickoff date and time less than 2 weeks away';
+        break;
       }
 
       break;
