@@ -72,6 +72,8 @@ functions:
     handler: src/functions/post-kickoff/handler.handler
   retry-kickoff:
     handler: src/functions/retry-kickoff/handler.handler
+  remove-kickoff:
+    handler: src/functions/remove-kickoff/handler.handler
 
   # User reminders
   add-user-reminder:

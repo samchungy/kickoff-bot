@@ -2,8 +2,7 @@ import {ChatPostMessageResponse} from '@slack/web-api';
 import {getUnixTime} from 'date-fns';
 import {format, zonedTimeToUtc} from 'date-fns-tz';
 import {KickoffEvent} from 'domain/events';
-import {RetryKickoffBlock} from 'domain/kickoff';
-import {SlackBlocks} from 'domain/slack';
+import {KickoffBlock, RetryKickoffBlock} from 'domain/kickoff';
 import {invokeAsync} from 'infrastructure/lambda-Interface';
 import {sendMessage} from 'infrastructure/slack-interface';
 import {putKickoff} from 'infrastructure/storage/kickoff-interface';
@@ -36,7 +35,7 @@ const handlePermissionError = async (event: KickoffEvent) => {
               text: 'Retry',
             },
             value: JSON.stringify(event),
-            action_id: 'retry',
+            action_id: 'retry-kickoff',
           },
         ],
       },
@@ -49,12 +48,25 @@ const handlePermissionError = async (event: KickoffEvent) => {
 
 const createSlackPost = async (event: KickoffEvent) => {
   const text = `<@${event.userId}> is kicking off *${event.description} * at *${getDateString(event.timezone, event.date, event.time)}*`;
-  const blocks: SlackBlocks = [
+  const blocks: KickoffBlock[] = [
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
         text,
+      },
+      accessory: {
+        type: 'overflow',
+        options: [
+          {
+            text: {
+              type: 'plain_text',
+              text: 'Delete Kickoff',
+            },
+            value: 'remove-kickoff',
+          },
+        ],
+        action_id: 'kickoff-overflow',
       },
     },
     {

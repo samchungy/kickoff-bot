@@ -12,7 +12,16 @@ type UserReminderEvent = {
   ts: string
 }
 
+type RemoveKickoffEvent = {
+  userId: string
+  channelId: string
+  ts: string
+  text: string
+  responseUrl: string
+}
+
 export {
-  UserReminderEvent,
   KickoffEvent,
+  RemoveKickoffEvent,
+  UserReminderEvent,
 };

@@ -1,8 +1,8 @@
-import {BasicSlackEvent, BlockAction, BlockElementAction, ReactionAddedEvent, ReactionRemovedEvent, SlashCommand, ViewOutput, ViewStateValue, ViewSubmitAction} from '@slack/bolt';
+import {BasicSlackEvent, BlockAction, BlockElementAction, Option, ReactionAddedEvent, ReactionRemovedEvent, SlashCommand, ViewOutput, ViewStateValue, ViewSubmitAction} from '@slack/bolt';
 
-import {ActionsBlock, Block, InputBlock, KnownBlock, View} from '@slack/types';
+import {ActionsBlock, Block, InputBlock, KnownBlock, Overflow, SectionBlock, View} from '@slack/types';
 import {APIGatewayEvent} from 'aws-lambda';
-import {RetryKickoffActionId} from './kickoff';
+import {KickoffOverflowActionId, RetryKickoffActionId} from './kickoff';
 import {KickoffCallbackId} from './kickoff-modal';
 interface SlashCommandAPIGatewayEvent extends Omit<APIGatewayEvent, 'body'> {
   body: SlashCommand
@@ -18,15 +18,27 @@ interface ActionId<A> {
   action_id: A
 }
 
+interface Value<V> {
+  value: V
+}
+
 interface SlackActionsBlock<A> extends Omit<ActionsBlock, 'elements'>{
   elements: (ActionsBlock['elements'][0] & ActionId<A>)[]
+}
+
+interface SlackOverflow<V> extends Omit<Overflow, 'options'>{
+  options: (Option & Value<V>)[]
+}
+
+interface SlackSectionActionBlock<A, V> extends Omit<SectionBlock, 'accessory'>{
+  accessory?: (Exclude<SectionBlock['accessory'], Overflow> | SlackOverflow<V>) & ActionId<A>
 }
 
 interface SlackInputBlock<I> extends Omit<InputBlock, 'element'> {
   element: InputBlock['element'] & ActionId<I>
 }
 
-type SlackBlockWithAction<A> = Exclude<KnownBlock, ActionsBlock> | SlackActionsBlock<A> | Block
+type SlackBlockWithAction<A, V> = Exclude<KnownBlock, ActionsBlock | SectionBlock> | SlackActionsBlock<A> | SlackSectionActionBlock<A, V> | Block
 
 type SlackBlockWithInput<I> = Exclude<KnownBlock, InputBlock> | SlackInputBlock<I> | Block
 
@@ -42,7 +54,7 @@ interface SlackView<B, I> extends Omit<View, 'blocks'> {
 type SlackViewValues<B extends string, A extends string> = ViewOutput['state']['values'] | Record<B, Record<A, ViewStateValue>>
 
 type SlackBlockActionElement = BlockElementAction & {
-  action_id: RetryKickoffActionId
+  action_id: RetryKickoffActionId | KickoffOverflowActionId
 }
 
 interface SlackBlockAction extends Omit<BlockAction, 'actions'> {
@@ -98,6 +110,7 @@ export {
   SlackCallbackEvent,
   SlackEnvelopedEvent,
   SlackEvent,
+  SlackSectionActionBlock,
   SlackView,
   SlackViewAction,
   SlackViewValues,

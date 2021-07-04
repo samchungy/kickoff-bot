@@ -135,4 +135,22 @@ const deleteScheduledMessage = async (sendTo: string, messageId: string) => {
   }
 };
 
-export {deleteScheduledMessage, fetchUserInfo, openModal, sendEphemeralMessage, updateModal, sendMessage, scheduleMessage};
+const deleteMessage = async (sendTo: string, ts: string) => {
+  try {
+    return await client.chat.delete({
+      channel: sendTo,
+      ts,
+      token: config.slack.token,
+    });
+  } catch (error) {
+    if (error.code === ErrorCode.PlatformError) {
+      logger.error(error.data, 'Failed to delete message in Slack');
+    } else {
+      logger.error(error, 'Failed to delete message in Slack');
+    }
+
+    throw error;
+  }
+};
+
+export {deleteMessage, deleteScheduledMessage, fetchUserInfo, openModal, sendEphemeralMessage, updateModal, sendMessage, scheduleMessage};

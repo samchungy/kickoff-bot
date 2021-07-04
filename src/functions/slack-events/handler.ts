@@ -17,7 +17,6 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayEvent, co
       }
 
       case 'event_callback': {
-        logger.info(payload);
         return eventCallbackHandler(payload);
       }
 
