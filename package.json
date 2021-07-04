@@ -28,7 +28,7 @@
     "pino-pretty": "5.1.0",
     "serverless": "2.50.0",
     "serverless-dynamodb-local": "0.2.40",
-    "serverless-esbuild": "1.14.0",
+    "serverless-esbuild": "1.16.0",
     "serverless-offline": "samchungy/serverless-offline#refs/tags/async-2",
     "typescript": "4.3.5"
   },
