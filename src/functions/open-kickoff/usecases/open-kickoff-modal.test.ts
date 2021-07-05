@@ -81,7 +81,6 @@ afterAll(() => {
 });
 
 beforeEach(() => {
-  jest.clearAllMocks();
   jest.resetAllMocks();
 
   // Defaults
@@ -93,12 +92,16 @@ beforeEach(() => {
 
 it('should call openEmptyKickoffModal with a triggerId', async () => {
   await expect(openKickoffModal(sampleSlashCommand)).resolves.toBeUndefined();
+
   expect(openEmptyKickoffModal).toBeCalledWith(sampleSlashCommand.trigger_id);
+  expect(logger.error).not.toBeCalled();
 });
 
 it('should call fetchUserInfo with a userId', async () => {
   await expect(openKickoffModal(sampleSlashCommand)).resolves.toBeUndefined();
+
   expect(fetchUserInfo).toBeCalledWith(sampleSlashCommand.user_id);
+  expect(logger.error).not.toBeCalled();
 });
 
 it('should call openEmptyKickoffModal with all the correct inputs', async () => {
@@ -117,6 +120,7 @@ it('should call openEmptyKickoffModal with all the correct inputs', async () => 
   await expect(openKickoffModal(sampleSlashCommand)).resolves.toBeUndefined();
 
   expect(updateKickoffModal).toBeCalledWith(expectedInputs);
+  expect(logger.error).not.toBeCalled();
 });
 
 describe('Date and time parsing', () => {
@@ -181,6 +185,7 @@ describe('Date and time parsing', () => {
     await expect(openKickoffModal(sampleSlashCommand)).resolves.toBeUndefined();
 
     expect(updateKickoffModal).toBeCalledWith(expect.objectContaining(expected));
+    expect(logger.error).not.toBeCalled();
   });
 });
 
