@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "TZ=UTC jest --coverage",
     "local:dynamodb": "npx dotenv-cli -c local -- npx sls dynamodb install",
     "local:sls-offline": "cd node_modules/serverless-offline && yarn",
     "local": "npx dotenv-cli -c local -- npx sls offline start -s local",
@@ -17,6 +17,7 @@
     "@slack/bolt": "3.4.0",
     "@slack/types": "2.1.0",
     "@types/aws-lambda": "8.10.77",
+    "@types/jest": "26.0.23",
     "@types/pino": "6.3.8",
     "@typescript-eslint/eslint-plugin": "4.28.1",
     "@typescript-eslint/parser": "4.28.1",
@@ -25,11 +26,13 @@
     "eslint": "7.30.0",
     "eslint-config-xo": "0.37.0",
     "inquirer": "8.1.1",
+    "jest": "27.0.6",
     "pino-pretty": "5.1.0",
     "serverless": "2.50.0",
     "serverless-dynamodb-local": "0.2.40",
     "serverless-esbuild": "1.16.0",
     "serverless-offline": "samchungy/serverless-offline#refs/tags/async-2",
+    "ts-jest": "27.0.3",
     "typescript": "4.3.5"
   },
   "dependencies": {

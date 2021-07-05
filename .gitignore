@@ -11,3 +11,7 @@ jspm_packages
 .esbuild
 
 .DS_Store
+
+# Jest
+
+coverage

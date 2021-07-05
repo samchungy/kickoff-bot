@@ -44,6 +44,7 @@ provider:
     LAMBDA_ENDPOINT: ${env:LAMBDA_ENDPOINT}
     DYNAMODB_ENDPOINT: ${env:DYNAMODB_ENDPOINT}
     KICKOFF_TABLE: ${self:custom.prefix}
+    TZ: UTC
 
 functions:
   # Slack
