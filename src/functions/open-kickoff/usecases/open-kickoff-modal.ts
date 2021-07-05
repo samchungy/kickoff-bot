@@ -1,12 +1,12 @@
 import {logger} from 'lib';
-import {SlashCommand} from 'domain/slack';
-import {fetchUserInfo, sendMessage} from 'infrastructure/slack-interface';
-import {add, roundToNearestMinutes} from 'date-fns';
-import {format} from 'date-fns-tz';
-
 import {config} from '../config';
-import {KickoffMetadata} from 'domain/kickoff-modal';
+import {fetchUserInfo, sendMessage} from 'infrastructure/slack-interface';
 import {openEmptyKickoffModal, updateKickoffModal} from 'lib/kickoff/modal';
+import {add, roundToNearestMinutes} from 'date-fns';
+import {format, utcToZonedTime} from 'date-fns-tz';
+
+import {SlashCommand} from 'domain/slack';
+import {KickoffMetadata} from 'domain/kickoff-modal';
 
 interface TimezoneInfo {
   tz: string,
@@ -29,7 +29,7 @@ const getNextAvailableTime = () => {
     nearestTo: config.roundToNearestMinutes,
   });
 
-  if (nextAvailableTime > minimumDate) {
+  if (nextAvailableTime >= minimumDate) {
     return nextAvailableTime;
   }
 
@@ -40,10 +40,10 @@ const getNextAvailableTime = () => {
 };
 
 const createNewKickoff = async (viewId: string, timezone: TimezoneInfo) => {
-  const initialDateTime = getNextAvailableTime();
-  const initialDate = format(initialDateTime, 'yyyy-MM-dd', {timeZone: timezone.tz});
-  const initialTime = format(initialDateTime, 'HH:mm', {timeZone: timezone.tz});
-  const timezoneString = `(UTC ${format(initialDateTime, 'xxx', {timeZone: timezone.tz})}) ${timezone.tz}`;
+  const initialDateTime = utcToZonedTime(getNextAvailableTime(), timezone.tz);
+  const initialDate = format(initialDateTime, 'yyyy-MM-dd');
+  const initialTime = format(initialDateTime, 'HH:mm');
+  const timezoneString = `(UTC ${format(initialDateTime, 'xxx', {timeZone: timezone.tz})}) ${timezone.label}`;
 
   const metadata: KickoffMetadata = {
     timezone: timezone.tz,
@@ -70,7 +70,7 @@ const openKickoffModal = async (command: SlashCommand) => {
     await createNewKickoff(viewId, timezoneInfo);
   } catch (error) {
     logger.error(error, 'Failed to open a kickoff modal');
-    return sendMessage(userId, ':white_frowning_face: Something went wrong! Please try again');
+    await sendMessage(userId, ':white_frowning_face: Something went wrong! Please try again');
   }
 };
 
