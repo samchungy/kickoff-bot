@@ -5,7 +5,7 @@ import {SlackBlocks} from 'domain/slack';
 
 const client = new WebClient();
 
-const handleCall = async (apiCall: Function, activity: string) => {
+const handleCall = async <T> (apiCall: () => Promise<T>, activity: string): Promise<T> => {
   try {
     return await apiCall();
   } catch (error) {
