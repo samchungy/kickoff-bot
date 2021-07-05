@@ -5,152 +5,84 @@ import {SlackBlocks} from 'domain/slack';
 
 const client = new WebClient();
 
-const openModal = async (triggerId: string, view: View) => {
+const handleCall = async (apiCall: Function, activity: string) => {
   try {
-    return await client.views.open({
-      trigger_id: triggerId,
-      view,
-      token: config.slack.token,
-    });
+    await apiCall();
   } catch (error) {
     if (error.code === ErrorCode.PlatformError) {
-      logger.error(error.data, 'Failed to open view in Slack');
+      logger.error(error.data, `Failed to ${activity} in Slack`);
     } else {
-      logger.error(error, 'Failed to open view in Slack');
+      logger.error(error, `Failed to ${activity} in Slack`);
     }
 
     throw error;
   }
 };
 
-const updateModal = async (viewId: string, view: View) => {
-  try {
-    return await client.views.update({
-      view_id: viewId,
-      view,
-      token: config.slack.token,
-    });
-  } catch (error) {
-    if (error.code === ErrorCode.PlatformError) {
-      logger.error(error.data, 'Failed to update view in Slack');
-    } else {
-      logger.error(error, 'Failed to update view in Slack');
-    }
+const openModal = async (triggerId: string, view: View) => await handleCall(() => client.views.open({
+  trigger_id: triggerId,
+  view,
+  token: config.slack.token,
+}), 'open modal');
 
-    throw error;
-  }
-};
+const updateModal = async (viewId: string, view: View) => await handleCall(() => client.views.update({
+  view_id: viewId,
+  view,
+  token: config.slack.token,
+}), 'update modal');
 
-const fetchUserInfo = async (userId: string) => {
-  try {
-    return await client.users.info({
-      user: userId,
-      token: config.slack.token,
-    });
-  } catch (error) {
-    if (error.code === ErrorCode.PlatformError) {
-      logger.error(error.data, 'Failed to get user info in Slack');
-    } else {
-      logger.error(error, 'Failed to get user info in Slack');
-    }
+const fetchUserInfo = async (userId: string) => await handleCall(() => client.users.info({
+  user: userId,
+  token: config.slack.token,
+}), 'get user info');
 
-    throw error;
-  }
-};
+const sendEphemeralMessage = async (
+  userId: string,
+  channelId: string,
+  message: string,
+  blocks?: SlackBlocks,
+) => await handleCall(() => client.chat.postEphemeral({
+  channel: channelId,
+  user: userId,
+  text: message,
+  blocks,
+  token: config.slack.token,
+}), 'send ephemeral message');
 
-const sendEphemeralMessage = async (userId: string, channelId: string, message: string, blocks?: SlackBlocks) => {
-  try {
-    return await client.chat.postEphemeral({
-      channel: channelId,
-      user: userId,
-      text: message,
-      blocks,
-      token: config.slack.token,
-    });
-  } catch (error) {
-    if (error.code === ErrorCode.PlatformError) {
-      logger.error(error.data, 'Failed to send ephemeral message in Slack');
-    } else {
-      logger.error(error, 'Failed to send ephemeral message in Slack');
-    }
+const sendMessage = async (
+  sendTo: string,
+  message: string,
+  blocks?: SlackBlocks,
+) => await handleCall(() => client.chat.postMessage({
+  channel: sendTo,
+  text: message,
+  blocks,
+  token: config.slack.token,
+}), 'send message');
 
-    throw error;
-  }
-};
+const scheduleMessage = async (
+  sendTo: string,
+  postAt: number,
+  message: string,
+  blocks?: SlackBlocks,
+) => await handleCall(() => client.chat.scheduleMessage({
+  channel: sendTo,
+  text: message,
+  blocks,
+  post_at: postAt,
+  token: config.slack.token,
+}), 'schedule message');
 
-const sendMessage = async (sendTo: string, message: string, blocks?: SlackBlocks) => {
-  try {
-    return await client.chat.postMessage({
-      channel: sendTo,
-      text: message,
-      blocks,
-      token: config.slack.token,
-    });
-  } catch (error) {
-    if (error.code === ErrorCode.PlatformError) {
-      logger.error(error.data, 'Failed to send message in Slack');
-    } else {
-      logger.error(error, 'Failed to send message in Slack');
-    }
+const deleteScheduledMessage = async (sendTo: string, messageId: string) => await handleCall(() => client.chat.deleteScheduledMessage({
+  channel: sendTo,
+  scheduled_message_id: messageId,
+  token: config.slack.token,
+}), 'delete scheduled message');
 
-    throw error;
-  }
-};
-
-const scheduleMessage = async (sendTo: string, postAt: number, message: string, blocks?: SlackBlocks) => {
-  try {
-    return await client.chat.scheduleMessage({
-      channel: sendTo,
-      text: message,
-      blocks,
-      post_at: postAt,
-      token: config.slack.token,
-    });
-  } catch (error) {
-    if (error.code === ErrorCode.PlatformError) {
-      logger.error(error.data, 'Failed to schedule message in Slack');
-    } else {
-      logger.error(error, 'Failed to schedule message in Slack');
-    }
-
-    throw error;
-  }
-};
-
-const deleteScheduledMessage = async (sendTo: string, messageId: string) => {
-  try {
-    return await client.chat.deleteScheduledMessage({
-      channel: sendTo,
-      scheduled_message_id: messageId,
-      token: config.slack.token,
-    });
-  } catch (error) {
-    if (error.code === ErrorCode.PlatformError) {
-      logger.error(error.data, 'Failed to delete scheduled message in Slack');
-    } else {
-      logger.error(error, 'Failed to delete scheduled message in Slack');
-    }
-
-    throw error;
-  }
-};
-
-const deleteMessage = async (sendTo: string, ts: string) => {
-  try {
-    return await client.chat.delete({
-      channel: sendTo,
-      ts,
-      token: config.slack.token,
-    });
-  } catch (error) {
-    if (error.code === ErrorCode.PlatformError) {
-      logger.error(error.data, 'Failed to delete message in Slack');
-    } else {
-      logger.error(error, 'Failed to delete message in Slack');
-    }
-
-    throw error;
-  }
-};
+const deleteMessage = async (sendTo: string, ts: string) => await handleCall(() => client.chat.delete({
+  channel: sendTo,
+  ts,
+  token: config.slack.token,
+}), 'delete message');
 
 export {deleteMessage, deleteScheduledMessage, fetchUserInfo, openModal, sendEphemeralMessage, updateModal, sendMessage, scheduleMessage};
