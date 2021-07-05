@@ -7,7 +7,7 @@ const client = new WebClient();
 
 const handleCall = async (apiCall: Function, activity: string) => {
   try {
-    await apiCall();
+    return await apiCall();
   } catch (error) {
     if (error.code === ErrorCode.PlatformError) {
       logger.error(error.data, `Failed to ${activity} in Slack`);
