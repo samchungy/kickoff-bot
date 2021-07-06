@@ -1,4 +1,4 @@
-import {ChatPostMessageResponse} from '@slack/web-api';
+import {ChatPostMessageResponse, ErrorCode, WebAPIPlatformError} from '@slack/web-api';
 import {getUnixTime} from 'date-fns';
 import {format, zonedTimeToUtc} from 'date-fns-tz';
 import {KickoffEvent} from 'domain/events';
@@ -43,6 +43,7 @@ const handlePermissionError = async (event: KickoffEvent) => {
     await sendMessage(event.userId, text, blocks);
   } catch (error) {
     logger.error(error, 'Failed to send post kickoff retry to user');
+    throw error;
   }
 };
 
@@ -89,8 +90,8 @@ const createSlackPost = async (event: KickoffEvent) => {
 
   try {
     return await sendMessage(event.channelId, text, blocks);
-  } catch (error) {
-    logger.error(error, `Failed to post to ${event.channelId}`);
+  } catch (error: unknown) {
+    logger.error({error}, `Failed to post to channel ${event.channelId}`);
     throw error;
   }
 };
@@ -109,11 +110,12 @@ const postKickoff = async (event: KickoffEvent) => {
       ts: metadata.ts as string,
       userId: event.userId,
     }});
-  } catch (error) {
-    if (error?.code === 'slack_webapi_platform_error' && error?.data?.error === 'not_in_channel') {
-      await handlePermissionError(event);
+  } catch (error: unknown) {
+    if ((error as WebAPIPlatformError).code === ErrorCode.PlatformError && (error as WebAPIPlatformError).data.error === 'not_in_channel') {
+      return await handlePermissionError(event);
     }
 
+    logger.error({error}, 'Failed to post kickoff');
     throw error;
   }
 };

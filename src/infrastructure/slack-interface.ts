@@ -1,4 +1,4 @@
-import {ErrorCode, View, WebClient} from '@slack/web-api';
+import {ErrorCode, View, WebAPIHTTPError, WebAPIPlatformError, WebClient} from '@slack/web-api';
 import {logger} from 'lib';
 import {config} from 'config';
 import {SlackBlocks} from 'domain/slack';
@@ -8,11 +8,11 @@ const client = new WebClient();
 const handleCall = async <T> (apiCall: () => Promise<T>, activity: string): Promise<T> => {
   try {
     return await apiCall();
-  } catch (error) {
-    if (error.code === ErrorCode.PlatformError) {
-      logger.error(error.data, `Failed to ${activity} in Slack`);
+  } catch (error: unknown) {
+    if ((error as WebAPIPlatformError).code === ErrorCode.PlatformError) {
+      logger.error((error as WebAPIPlatformError).data, `Failed to ${activity} in Slack`);
     } else {
-      logger.error(error, `Failed to ${activity} in Slack`);
+      logger.error(error as WebAPIHTTPError, `Failed to ${activity} in Slack`);
     }
 
     throw error;
