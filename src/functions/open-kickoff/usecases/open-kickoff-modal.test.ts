@@ -123,70 +123,62 @@ it('should call openEmptyKickoffModal with all the correct inputs', async () => 
   expect(logger.error).not.toBeCalled();
 });
 
-describe('Date and time parsing', () => {
-  const viewId = 'VMHU10V25';
+it.each([{
+  it: 'should round up the initial time to 00:15 when time is 00:00',
+  currentTime: '2021-01-01T00:00:00',
+  userInfo: sampleUserInfo('UTC', 'UTC'),
+  expected: {
+    initialDate: '2021-01-01',
+    initialTime: '00:15',
+    timezone: '(UTC +00:00) UTC',
+  },
+},
+{
+  it: 'should round up the initial time to 00:30 when time is 00:01',
+  currentTime: '2021-01-01T00:01:00',
+  userInfo: sampleUserInfo('UTC', 'UTC'),
+  expected: {
+    initialDate: '2021-01-01',
+    initialTime: '00:30',
+    timezone: '(UTC +00:00) UTC',
+  },
+},
+{
+  it: 'should round up the initial time to 00:45 when time is 00:29',
+  currentTime: '2021-01-01T00:29:00',
+  userInfo: sampleUserInfo('UTC', 'UTC'),
+  expected: {
+    initialDate: '2021-01-01',
+    initialTime: '00:45',
+    timezone: '(UTC +00:00) UTC',
+  },
+},
+{
+  it: 'should round up the initial time to 01:00 when time is 00:45',
+  currentTime: '2021-01-01T00:45:00',
+  userInfo: sampleUserInfo('UTC', 'UTC'),
+  expected: {
+    initialDate: '2021-01-01',
+    initialTime: '01:00',
+    timezone: '(UTC +00:00) UTC',
+  },
+},
+{
+  it: 'should correctly convert the time to a specific timezone',
+  currentTime: '2021-01-01T00:00:00',
+  userInfo: sampleUserInfo('Australian Eastern Standard Time', 'Australia/Melbourne'),
+  expected: {
+    initialDate: '2021-01-01',
+    initialTime: '11:15',
+    timezone: '(UTC +11:00) Australian Eastern Standard Time',
+  },
+}])('$it', async ({currentTime, expected, userInfo}) => {
+  mocked(fetchUserInfo).mockResolvedValue(userInfo);
+  jest.setSystemTime(new Date(currentTime));
+  await expect(openKickoffModal(sampleSlashCommand)).resolves.toBeUndefined();
 
-  beforeEach(() => {
-    mocked(openEmptyKickoffModal).mockResolvedValue(viewId);
-  });
-
-  it.each([{
-    it: 'should round up the initial time to 00:15 when time is 00:00',
-    currentTime: '2021-01-01T00:00:00',
-    userInfo: sampleUserInfo('UTC', 'UTC'),
-    expected: {
-      initialDate: '2021-01-01',
-      initialTime: '00:15',
-      timezone: '(UTC +00:00) UTC',
-    },
-  },
-  {
-    it: 'should round up the initial time to 00:30 when time is 00:01',
-    currentTime: '2021-01-01T00:01:00',
-    userInfo: sampleUserInfo('UTC', 'UTC'),
-    expected: {
-      initialDate: '2021-01-01',
-      initialTime: '00:30',
-      timezone: '(UTC +00:00) UTC',
-    },
-  },
-  {
-    it: 'should round up the initial time to 00:45 when time is 00:29',
-    currentTime: '2021-01-01T00:29:00',
-    userInfo: sampleUserInfo('UTC', 'UTC'),
-    expected: {
-      initialDate: '2021-01-01',
-      initialTime: '00:45',
-      timezone: '(UTC +00:00) UTC',
-    },
-  },
-  {
-    it: 'should round up the initial time to 01:00 when time is 00:45',
-    currentTime: '2021-01-01T00:45:00',
-    userInfo: sampleUserInfo('UTC', 'UTC'),
-    expected: {
-      initialDate: '2021-01-01',
-      initialTime: '01:00',
-      timezone: '(UTC +00:00) UTC',
-    },
-  },
-  {
-    it: 'should correctly convert the time to a specific timezone',
-    currentTime: '2021-01-01T00:00:00',
-    userInfo: sampleUserInfo('Australian Eastern Standard Time', 'Australia/Melbourne'),
-    expected: {
-      initialDate: '2021-01-01',
-      initialTime: '11:15',
-      timezone: '(UTC +11:00) Australian Eastern Standard Time',
-    },
-  }])('$it', async ({currentTime, expected, userInfo}) => {
-    mocked(fetchUserInfo).mockResolvedValue(userInfo);
-    jest.setSystemTime(new Date(currentTime));
-    await expect(openKickoffModal(sampleSlashCommand)).resolves.toBeUndefined();
-
-    expect(updateKickoffModal).toBeCalledWith(expect.objectContaining(expected));
-    expect(logger.error).not.toBeCalled();
-  });
+  expect(updateKickoffModal).toBeCalledWith(expect.objectContaining(expected));
+  expect(logger.error).not.toBeCalled();
 });
 
 it('should log an error and return a message to the user when something fails', async () => {
