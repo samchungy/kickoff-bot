@@ -100,6 +100,22 @@ it('should attempt to send a Slack error message if the function fails to post',
   expect(sendMessage).lastCalledWith(kickoffEvent.userId, expectedText, expect.any(Object));
 });
 
+it('should log and throw an error if it fails to post the retry kickoff to the user', async () => {
+  const slackPlatformError: WebAPIPlatformError = {
+    code: ErrorCode.PlatformError,
+    data: {
+      ok: false,
+      error: 'not_in_channel',
+    },
+    name: ErrorCode.PlatformError,
+    message: 'not_in_channel',
+  };
+  mocked(sendMessage).mockRejectedValue(slackPlatformError);
+
+  await expect(postKickoff(kickoffEvent)).rejects.toBe(slackPlatformError);
+  expect(logger.error).toBeCalledWith(slackPlatformError, 'Failed to send post kickoff retry to user');
+});
+
 it('should log and throw an error when store fails', async () => {
   const error = new Error();
   mocked(putKickoff).mockRejectedValue(error);
