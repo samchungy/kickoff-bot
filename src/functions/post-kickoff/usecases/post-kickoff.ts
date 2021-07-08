@@ -7,6 +7,7 @@ import {invokeAsync} from 'infrastructure/lambda-Interface';
 import {sendMessage} from 'infrastructure/slack-interface';
 import {putKickoff} from 'infrastructure/storage/kickoff-interface';
 import {logger} from 'lib';
+import {createKickoffMetadata} from './create-kickoff-metadata';
 
 const getDateString = (timezone: string, date: string, time: string) => {
   const kickoffDate = zonedTimeToUtc(`${date} ${time}`, timezone);
@@ -16,7 +17,7 @@ const getDateString = (timezone: string, date: string, time: string) => {
 
 const handlePermissionError = async (event: KickoffEvent) => {
   try {
-    const text = `:information_source: Failed to post a kickoff to <#${event.channelId}>. Please run \`/invite @kickoff\` in the channel and click the retry button below.`;
+    const text = `:information_source: Failed to post a kickoff to <#${event.values.channelId}>. Please run \`/invite @kickoff\` in the channel and click the retry button below.`;
     const blocks: RetryKickoffBlock[] = [
       {
         type: 'section',
@@ -48,7 +49,7 @@ const handlePermissionError = async (event: KickoffEvent) => {
 };
 
 const createSlackPost = async (event: KickoffEvent) => {
-  const text = `<@${event.userId}> is kicking off *${event.description} * at *${getDateString(event.timezone, event.date, event.time)}*`;
+  const text = `<@${event.userId}> is kicking off *${event.values.description} * at *${getDateString(event.metadata.timezone, event.values.date, event.values.time)}*`;
   const blocks: KickoffBlock[] = [
     {
       type: 'section',
@@ -74,7 +75,7 @@ const createSlackPost = async (event: KickoffEvent) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `Zoom Meeting URL: ${event.zoom}`,
+        text: `Zoom Meeting URL: ${event.values.zoom}`,
       },
     },
     {
@@ -89,16 +90,17 @@ const createSlackPost = async (event: KickoffEvent) => {
   ];
 
   try {
-    return await sendMessage(event.channelId, text, blocks);
+    return await sendMessage(event.values.channelId, text, blocks);
   } catch (error: unknown) {
-    logger.error({error}, `Failed to post to channel ${event.channelId}`);
+    logger.error({error}, `Failed to post to channel ${event.values.channelId}`);
     throw error;
   }
 };
 
 const storeKickoff = async (event: KickoffEvent, metadata: ChatPostMessageResponse) => {
-  const time = zonedTimeToUtc(`${event.date} ${event.time}`, event.timezone).getTime() / 1000;
-  await putKickoff(event.channelId, metadata.ts as string, time, event.userId);
+  const time = zonedTimeToUtc(`${event.values.date} ${event.values.time}`, event.metadata.timezone).getTime() / 1000;
+  const kickoffMetadata = createKickoffMetadata(event, metadata.ts as string, event.userId, time);
+  await putKickoff(kickoffMetadata);
 };
 
 const postKickoff = async (event: KickoffEvent) => {
@@ -106,7 +108,7 @@ const postKickoff = async (event: KickoffEvent) => {
     const metadata = await createSlackPost(event);
     await storeKickoff(event, metadata);
     await invokeAsync({functionName: 'add-user-reminder', payload: {
-      channelId: event.channelId,
+      channelId: event.values.channelId,
       ts: metadata.ts as string,
       userId: event.userId,
     }});

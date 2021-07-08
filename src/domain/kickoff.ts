@@ -6,6 +6,7 @@ interface KickoffItem {
   hashKey: string
   rangeKey: string
   eventTime: number
+  domain: string
   author: string
   users: UserScheduledMessage
 }

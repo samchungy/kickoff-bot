@@ -6,6 +6,7 @@ import {openEmptyKickoffModal, updateKickoffModal} from 'lib/kickoff/modal';
 import {SlashCommand} from 'domain/slack';
 import {UsersInfoResponse} from '@slack/web-api';
 import {logger} from 'lib';
+import {KickoffMetadata} from 'domain/kickoff-modal';
 
 jest.mock('lib');
 jest.mock('lib/kickoff/modal');
@@ -105,8 +106,9 @@ it('should call fetchUserInfo with a userId', async () => {
 });
 
 it('should call openEmptyKickoffModal with all the correct inputs', async () => {
-  const expectedMetadata = {
+  const expectedMetadata: KickoffMetadata = {
     timezone: 'UTC',
+    domain: 'spotbottest',
   };
 
   const expectedInputs = {

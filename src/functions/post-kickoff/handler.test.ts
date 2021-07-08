@@ -11,14 +11,19 @@ jest.mock('./usecases/post-kickoff');
 const callback = () => {};
 
 const kickoffEvent: KickoffEvent = {
-  channelId: 'C025RNKNB28',
-  date: '2021-01-28',
-  description: 'test kickoff',
-  time: '20:30',
-  timezone: 'Australia/Melbourne',
+  values: {
+    channelId: 'C025RNKNB28',
+    date: '2021-01-28',
+    description: 'test kickoff',
+    time: '20:30',
+    zoom: 'https://seek.zoom.us/j/2089361925?pwd=test',
+  },
+  metadata: {
+    timezone: 'Australia/Melbourne',
+    domain: 'spotbottest',
+  },
   userId: 'URVUTD7UP',
   viewId: 'VMHU10V25',
-  zoom: 'https://seek.zoom.us/j/2089361925?pwd=test',
 };
 
 beforeEach(jest.clearAllMocks);

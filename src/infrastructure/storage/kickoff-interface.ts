@@ -1,31 +1,19 @@
 import {GetCommand, PutCommand, UpdateCommand} from '@aws-sdk/lib-dynamodb';
 import {config} from 'config';
+import {HashRangeKey} from 'domain/db';
 import {KickoffItem} from 'domain/kickoff';
 import {client} from './dynamodb-client';
 
-const createHashKey = (channelId: string) => `channel-${channelId}`;
-const createRangeKey = (ts: string) => `timestamp-${ts}`;
-
-const putKickoff = async (channelId: string, ts: string, eventTime: number, author: string) => {
-  const item: KickoffItem = {
-    hashKey: createHashKey(channelId),
-    rangeKey: createRangeKey(ts),
-    eventTime,
-    author,
-    users: {},
-  };
+const putKickoff = async (item: KickoffItem) => {
   await client.send(new PutCommand({
     Item: item,
     TableName: config.dynamodb.tableName,
   }));
 };
 
-const addKickoffUser = async (channelId: string, ts: string, userId: string, messageId: string) => {
+const addKickoffUser = async (key: HashRangeKey, userId: string, messageId: string) => {
   await client.send(new UpdateCommand({
-    Key: {
-      hashKey: createHashKey(channelId),
-      rangeKey: createRangeKey(ts),
-    },
+    Key: key,
     TableName: config.dynamodb.tableName,
     ConditionExpression: 'attribute_not_exists(#users.#userId)',
     ExpressionAttributeValues: {
@@ -39,12 +27,9 @@ const addKickoffUser = async (channelId: string, ts: string, userId: string, mes
   }));
 };
 
-const removeKickoffUser = async (channelId: string, ts: string, userId: string) => {
+const removeKickoffUser = async (key: HashRangeKey, userId: string) => {
   await client.send(new UpdateCommand({
-    Key: {
-      hashKey: createHashKey(channelId),
-      rangeKey: createRangeKey(ts),
-    },
+    Key: key,
     TableName: config.dynamodb.tableName,
     ConditionExpression: 'attribute_exists(#user.#userId)',
     ExpressionAttributeNames: {
@@ -55,12 +40,9 @@ const removeKickoffUser = async (channelId: string, ts: string, userId: string) 
   }));
 };
 
-const getKickoff = async (channelId: string, ts: string) => {
+const getKickoff = async (key: HashRangeKey) => {
   const payload = await client.send(new GetCommand({
-    Key: {
-      hashKey: createHashKey(channelId),
-      rangeKey: createRangeKey(ts),
-    },
+    Key: key,
     TableName: config.dynamodb.tableName,
   }));
   return payload.Item as KickoffItem | undefined;

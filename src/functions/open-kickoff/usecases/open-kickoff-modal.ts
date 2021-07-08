@@ -39,13 +39,14 @@ const getNextAvailableTime = () => {
   });
 };
 
-const createNewKickoff = async (viewId: string, timezone: TimezoneInfo) => {
+const createNewKickoff = async (viewId: string, timezone: TimezoneInfo, domain: string) => {
   const initialDateTime = utcToZonedTime(getNextAvailableTime(), timezone.tz);
   const initialDate = format(initialDateTime, 'yyyy-MM-dd');
   const initialTime = format(initialDateTime, 'HH:mm');
   const timezoneString = `(UTC ${format(initialDateTime, 'xxx', {timeZone: timezone.tz})}) ${timezone.label}`;
 
   const metadata: KickoffMetadata = {
+    domain,
     timezone: timezone.tz,
   };
 
@@ -59,7 +60,7 @@ const createNewKickoff = async (viewId: string, timezone: TimezoneInfo) => {
 };
 
 const openKickoffModal = async (command: SlashCommand) => {
-  const {trigger_id: triggerId, user_id: userId} = command;
+  const {trigger_id: triggerId, user_id: userId, team_domain} = command;
 
   try {
     const [viewId, timezoneInfo] = await Promise.all([
@@ -67,7 +68,7 @@ const openKickoffModal = async (command: SlashCommand) => {
       openEmptyKickoffModal(triggerId),
       fetchUserTimezone(userId),
     ]);
-    await createNewKickoff(viewId, timezoneInfo);
+    await createNewKickoff(viewId, timezoneInfo, team_domain);
   } catch (error) {
     logger.error(error, 'Failed to open a kickoff modal');
     await sendMessage(userId, ':white_frowning_face: Something went wrong! Please try again');

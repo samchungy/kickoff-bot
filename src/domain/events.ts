@@ -1,9 +1,10 @@
-import {KickoffValues} from './kickoff-modal';
+import {KickoffMetadata, KickoffValues} from './kickoff-modal';
 
-type KickoffEvent = KickoffValues & {
+type KickoffEvent = {
   viewId: string
   userId: string
-  timezone: string
+  values: KickoffValues
+  metadata: KickoffMetadata
 }
 
 type UserReminderEvent = {

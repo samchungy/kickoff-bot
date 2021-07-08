@@ -15,14 +15,19 @@ jest.mock('infrastructure/storage/kickoff-interface');
 jest.mock('lib');
 
 const kickoffEvent: KickoffEvent = {
-  channelId: 'C025RNKNB28',
-  date: '2021-01-28',
-  description: 'test kickoff',
-  time: '20:30',
-  timezone: 'Australia/Melbourne',
+  values: {
+    channelId: 'C025RNKNB28',
+    date: '2021-01-28',
+    description: 'test kickoff',
+    time: '20:30',
+    zoom: 'https://seek.zoom.us/j/2089361925?pwd=test',
+  },
+  metadata: {
+    timezone: 'Australia/Melbourne',
+    domain: 'spotbottest',
+  },
   userId: 'URVUTD7UP',
   viewId: 'VMHU10V25',
-  zoom: 'https://seek.zoom.us/j/2089361925?pwd=test',
 };
 
 const samplePostMessageResponse: ChatPostMessageResponse = {
@@ -63,19 +68,28 @@ it('should call the slack interface to create an new post', async () => {
 
   await expect(postKickoff(kickoffEvent)).resolves.toBeUndefined();
 
-  expect(sendMessage).toBeCalledWith(kickoffEvent.channelId, expectedText, expect.any(Object));
+  expect(sendMessage).toBeCalledWith(kickoffEvent.values.channelId, expectedText, expect.any(Object));
 });
 
 it('should call the kickoff interface to store the kickoff metadata', async () => {
+  const expectedItem = ({
+    hashKey: `channel-${kickoffEvent.values.channelId}`,
+    rangeKey: `timestamp-${samplePostMessageResponse.ts}`,
+    author: kickoffEvent.userId,
+    domain: kickoffEvent.metadata.domain,
+    eventTime: 1611826200,
+    users: {},
+  });
+
   await expect(postKickoff(kickoffEvent)).resolves.toBeUndefined();
 
-  expect(putKickoff).toBeCalledWith(kickoffEvent.channelId, samplePostMessageResponse.ts, 1611826200, kickoffEvent.userId);
+  expect(putKickoff).toBeCalledWith(expectedItem);
 });
 
 it('should call to async invoke the add user reminder function', async () => {
   await expect(postKickoff(kickoffEvent)).resolves.toBeUndefined();
   expect(invokeAsync).toBeCalledWith({functionName: 'add-user-reminder', payload: {
-    channelId: kickoffEvent.channelId,
+    channelId: kickoffEvent.values.channelId,
     ts: samplePostMessageResponse.ts,
     userId: kickoffEvent.userId,
   }});

@@ -2,7 +2,6 @@ const config = {
   slack: {
     token: process.env.SLACK_TOKEN || '',
     secret: process.env.SLACK_SIGNING_SECRET || '',
-    domain: process.env.SLACK_DOMAIN || '',
   },
   lambda: {
     opts: {

@@ -101,8 +101,8 @@ const submitKickoffModal = async (modal: {
   }
 
   const payload: KickoffEvent = {
-    ...extractedValues,
-    ...extractedMetadata,
+    values: extractedValues,
+    metadata: extractedMetadata,
     viewId: modal.viewId,
     userId: modal.userId,
   };
