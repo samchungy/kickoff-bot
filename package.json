@@ -27,7 +27,7 @@
     "eslint-config-xo": "0.37.0",
     "inquirer": "8.1.1",
     "jest": "27.0.6",
-    "pino-pretty": "5.1.0",
+    "pino-pretty": "5.1.1",
     "serverless": "2.51.0",
     "serverless-dynamodb-local": "0.2.40",
     "serverless-esbuild": "1.16.1",
