@@ -4,14 +4,15 @@ import {getKickoff, removeKickoffUser} from 'infrastructure/storage/kickoff-gate
 import {logger} from 'lib';
 
 const removeUserReminder = async (event: UserReminderEvent) => {
-  const kickoff = await getKickoff(event.channelId, event.ts);
-
-  if (!kickoff || !kickoff.users[event.userId] || kickoff.eventTime <= new Date().getTime() / 1000) {
-    logger.info({kickoff}, 'No kickoff or user already is gone');
-    return;
-  }
-
   try {
+    const kickoff = await getKickoff(event.channelId, event.ts);
+    const currentTime = new Date().getTime() / 1000;
+
+    if (!kickoff || !kickoff.users[event.userId] || kickoff.eventTime >= currentTime) {
+      logger.info({event, kickoff, currentTime}, 'No kickoff or user already is gone');
+      return;
+    }
+
     await Promise.all([
       deleteScheduledMessage(event.channelId, kickoff.users[event.userId]),
       removeKickoffUser(event.channelId, event.ts, event.userId),
