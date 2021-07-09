@@ -8222,10 +8222,10 @@ serverless-dynamodb-local@0.2.40:
     dynamodb-localhost "0.0.9"
     lodash "^4.17.0"
 
-serverless-esbuild@1.16.0:
-  version "1.16.0"
-  resolved "https://registry.yarnpkg.com/serverless-esbuild/-/serverless-esbuild-1.16.0.tgz#cf05ef4b924ba44664750db4cabdbfcbf2e04f95"
-  integrity sha512-9jM4e6gUQ8SJV4jXgdpg1niw9cVF+8rQiW8lwCr2iq8bqXFw9cMOjzNWp4A5SAhcwVvNr0642qxJ0njrrjDPMg==
+serverless-esbuild@1.16.1:
+  version "1.16.1"
+  resolved "https://registry.yarnpkg.com/serverless-esbuild/-/serverless-esbuild-1.16.1.tgz#2669a5ecf6a7c05264269b9756df47352f5fb77f"
+  integrity sha512-JEV+7FKb5MRh2CXp/50iSQ1G9v/k0CahEA1bXJ3aU1kuowda3RS5f8W5yz3kGwRtf6nbZQnbLdbdBa9MR2963A==
   dependencies:
     bestzip "^2.2.0"
     chokidar "^3.4.3"
