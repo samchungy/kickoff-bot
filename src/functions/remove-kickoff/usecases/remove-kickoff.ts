@@ -1,7 +1,7 @@
 import {RemoveKickoffEvent} from 'domain/events';
 import {respond} from 'functions/slack-actions/usecases/respond';
-import {deleteMessage, deleteScheduledMessage, sendMessage} from 'infrastructure/slack-interface';
-import {getKickoff} from 'infrastructure/storage/kickoff-interface';
+import {deleteMessage, deleteScheduledMessage, sendMessage} from 'infrastructure/slack-gateway';
+import {getKickoff} from 'infrastructure/storage/kickoff-gateway';
 
 const removeKickoff = async (event: RemoveKickoffEvent) => {
   if (!event.text.startsWith(`<@${event.userId}>`)) {

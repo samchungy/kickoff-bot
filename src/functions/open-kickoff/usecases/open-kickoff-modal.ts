@@ -1,6 +1,6 @@
 import {logger} from 'lib';
 import {config} from '../config';
-import {fetchUserInfo, sendMessage} from 'infrastructure/slack-interface';
+import {fetchUserInfo, sendMessage} from 'infrastructure/slack-gateway';
 import {openEmptyKickoffModal, updateKickoffModal} from 'lib/kickoff/modal';
 import {add, roundToNearestMinutes} from 'date-fns';
 import {format, utcToZonedTime} from 'date-fns-tz';

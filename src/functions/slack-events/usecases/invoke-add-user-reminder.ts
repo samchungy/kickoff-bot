@@ -1,4 +1,4 @@
-import {invokeAsync} from 'infrastructure/lambda-Interface';
+import {invokeAsync} from 'infrastructure/lambda-gateway';
 
 const invokeAddUserReminder = async (channelId: string, userId: string, ts: string) => {
   await invokeAsync({

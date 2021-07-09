@@ -1,6 +1,6 @@
 import {mocked} from 'ts-jest/utils';
 import {openKickoffModal} from './open-kickoff-modal';
-import {fetchUserInfo, sendMessage} from 'infrastructure/slack-interface';
+import {fetchUserInfo, sendMessage} from 'infrastructure/slack-gateway';
 import {openEmptyKickoffModal, updateKickoffModal} from 'lib/kickoff/modal';
 
 import {SlashCommand} from 'domain/slack';
@@ -10,7 +10,7 @@ import {KickoffMetadata} from 'domain/kickoff-modal';
 
 jest.mock('lib');
 jest.mock('lib/kickoff/modal');
-jest.mock('infrastructure/slack-interface');
+jest.mock('infrastructure/slack-gateway');
 
 const sampleViewId = 'VMHU10V25';
 

@@ -1,17 +1,18 @@
 import {InvokeCommandOutput} from '@aws-sdk/client-lambda';
 import {ChatPostMessageResponse, ErrorCode, WebAPIPlatformError} from '@slack/web-api';
 import {KickoffEvent} from 'domain/events';
+import {Kickoff} from 'domain/kickoff';
 
-import {invokeAsync} from 'infrastructure/lambda-Interface';
-import {sendMessage} from 'infrastructure/slack-interface';
-import {putKickoff} from 'infrastructure/storage/kickoff-interface';
+import {invokeAsync} from 'infrastructure/lambda-gateway';
+import {sendMessage} from 'infrastructure/slack-gateway';
+import {putKickoff} from 'infrastructure/storage/kickoff-gateway';
 import {logger} from 'lib';
 import {mocked} from 'ts-jest/utils';
 import {postKickoff} from './post-kickoff';
 
-jest.mock('infrastructure/lambda-Interface');
-jest.mock('infrastructure/slack-interface');
-jest.mock('infrastructure/storage/kickoff-interface');
+jest.mock('infrastructure/lambda-gateway');
+jest.mock('infrastructure/slack-gateway');
+jest.mock('infrastructure/storage/kickoff-gateway');
 jest.mock('lib');
 
 const kickoffEvent: KickoffEvent = {
@@ -72,9 +73,7 @@ it('should call the slack interface to create an new post', async () => {
 });
 
 it('should call the kickoff interface to store the kickoff metadata', async () => {
-  const expectedItem = ({
-    hashKey: `channel-${kickoffEvent.values.channelId}`,
-    rangeKey: `timestamp-${samplePostMessageResponse.ts}`,
+  const expectedItem: Kickoff = ({
     author: kickoffEvent.userId,
     domain: kickoffEvent.metadata.domain,
     eventTime: 1611826200,

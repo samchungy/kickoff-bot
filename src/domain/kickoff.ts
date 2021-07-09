@@ -2,13 +2,16 @@ import {SlackBlockWithAction} from './slack';
 
 type UserScheduledMessage = Record<string, string>
 
-interface KickoffItem {
-  hashKey: string
-  rangeKey: string
+interface Kickoff {
   eventTime: number
   domain: string
   author: string
   users: UserScheduledMessage
+}
+
+interface KickoffRecord extends Kickoff {
+  hashKey: string
+  rangeKey: string
 }
 
 type RetryKickoffActionId = 'retry-kickoff'
@@ -27,7 +30,8 @@ type KickoffOverflowValues = 'remove-kickoff'
 type KickoffBlock = SlackBlockWithAction<KickoffOverflowActionId, KickoffOverflowValues>
 
 export {
-  KickoffItem,
+  Kickoff,
+  KickoffRecord,
   KickoffOverflowActionId,
   KickoffOverflowValues,
   RetryKickoffActionId,

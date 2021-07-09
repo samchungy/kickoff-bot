@@ -3,7 +3,7 @@ import {add} from 'date-fns';
 import {KickoffEvent} from 'domain/events';
 import {KickoffBlockId, KickoffMetadata, KickoffValues} from 'domain/kickoff-modal';
 import {SlackViewValues} from 'domain/slack';
-import {invokeAsync} from 'infrastructure/lambda-Interface';
+import {invokeAsync} from 'infrastructure/lambda-gateway';
 import {logger} from 'lib';
 
 const urlPattern = new RegExp('^(https?:\\/\\/)?' // Protocol

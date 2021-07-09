@@ -1,5 +1,5 @@
 import {KickoffEvent} from 'domain/events';
-import {invokeAsync} from 'infrastructure/lambda-Interface';
+import {invokeAsync} from 'infrastructure/lambda-gateway';
 import {openEmptyKickoffModal} from 'lib/kickoff/modal';
 
 const invokeRetryKickoff = async (value: string, triggerId: string) => {

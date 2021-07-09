@@ -3,11 +3,11 @@ import {getUnixTime} from 'date-fns';
 import {format, zonedTimeToUtc} from 'date-fns-tz';
 import {KickoffEvent} from 'domain/events';
 import {KickoffBlock, RetryKickoffBlock} from 'domain/kickoff';
-import {invokeAsync} from 'infrastructure/lambda-Interface';
-import {sendMessage} from 'infrastructure/slack-interface';
-import {putKickoff} from 'infrastructure/storage/kickoff-interface';
+import {invokeAsync} from 'infrastructure/lambda-gateway';
+import {sendMessage} from 'infrastructure/slack-gateway';
+import {putKickoff} from 'infrastructure/storage/kickoff-gateway';
 import {logger} from 'lib';
-import {createKickoffMetadata} from './create-kickoff-metadata';
+import {createKickoff} from './create-kickoff';
 
 const getDateString = (timezone: string, date: string, time: string) => {
   const kickoffDate = zonedTimeToUtc(`${date} ${time}`, timezone);
@@ -99,8 +99,8 @@ const createSlackPost = async (event: KickoffEvent) => {
 
 const storeKickoff = async (event: KickoffEvent, metadata: ChatPostMessageResponse) => {
   const time = zonedTimeToUtc(`${event.values.date} ${event.values.time}`, event.metadata.timezone).getTime() / 1000;
-  const kickoffMetadata = createKickoffMetadata(event, metadata.ts as string, event.userId, time);
-  await putKickoff(kickoffMetadata);
+  const kickoff = createKickoff(event, metadata.ts as string, event.userId, time);
+  await putKickoff(kickoff);
 };
 
 const postKickoff = async (event: KickoffEvent) => {

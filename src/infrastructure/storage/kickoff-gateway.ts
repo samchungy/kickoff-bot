@@ -1,19 +1,27 @@
 import {GetCommand, PutCommand, UpdateCommand} from '@aws-sdk/lib-dynamodb';
 import {config} from 'config';
 import {HashRangeKey} from 'domain/db';
-import {KickoffItem} from 'domain/kickoff';
+import {Kickoff, KickoffRecord} from 'domain/kickoff';
 import {client} from './dynamodb-client';
 
-const putKickoff = async (item: KickoffItem) => {
+const createHashKey = (channelId: string) => `channel-${channelId}`;
+const createRangeKey = (ts: string) => `timestamp-${ts}`;
+
+const createHashRangeKey = (channelId: string, ts: string): HashRangeKey => ({
+  hashKey: createHashKey(channelId),
+  rangeKey: createRangeKey(ts),
+});
+
+const putKickoff = async (item: Kickoff) => {
   await client.send(new PutCommand({
     Item: item,
     TableName: config.dynamodb.tableName,
   }));
 };
 
-const addKickoffUser = async (key: HashRangeKey, userId: string, messageId: string) => {
+const addKickoffUser = async (channelId: string, ts: string, userId: string, messageId: string) => {
   await client.send(new UpdateCommand({
-    Key: key,
+    Key: createHashRangeKey(channelId, ts),
     TableName: config.dynamodb.tableName,
     ConditionExpression: 'attribute_not_exists(#users.#userId)',
     ExpressionAttributeValues: {
@@ -27,9 +35,9 @@ const addKickoffUser = async (key: HashRangeKey, userId: string, messageId: stri
   }));
 };
 
-const removeKickoffUser = async (key: HashRangeKey, userId: string) => {
+const removeKickoffUser = async (channelId: string, ts: string, userId: string) => {
   await client.send(new UpdateCommand({
-    Key: key,
+    Key: createHashRangeKey(channelId, ts),
     TableName: config.dynamodb.tableName,
     ConditionExpression: 'attribute_exists(#user.#userId)',
     ExpressionAttributeNames: {
@@ -40,12 +48,12 @@ const removeKickoffUser = async (key: HashRangeKey, userId: string) => {
   }));
 };
 
-const getKickoff = async (key: HashRangeKey) => {
+const getKickoff = async (channelId: string, ts: string) => {
   const payload = await client.send(new GetCommand({
-    Key: key,
+    Key: createHashRangeKey(channelId, ts),
     TableName: config.dynamodb.tableName,
   }));
-  return payload.Item as KickoffItem | undefined;
+  return payload.Item as KickoffRecord | undefined;
 };
 
 export {addKickoffUser, getKickoff, putKickoff, removeKickoffUser};

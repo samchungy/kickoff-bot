@@ -1,6 +1,6 @@
 import {KickoffBlockId, KickoffMetadata} from 'domain/kickoff-modal';
 import {SlackView} from 'domain/slack';
-import {openModal, updateModal} from 'infrastructure/slack-interface';
+import {openModal, updateModal} from 'infrastructure/slack-gateway';
 
 const openEmptyKickoffModal = async (triggerId: string): Promise<string> => {
   const view: SlackView<undefined, undefined> = {
