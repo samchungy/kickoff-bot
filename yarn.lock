@@ -2134,7 +2134,7 @@
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-1.3.2.tgz#93e25bf9ee75fe0fd80b594bc4feb0e862111b5a"
   integrity sha512-YATxVxgRqNH6nHEIsvg6k2Boc1JHI9ZbH5iWFFv/MTkchz3b1ieGDa5T0a9RznNdI0KhVbdbWSN+KWWrQZRxTw==
 
-"@types/node@*", "@types/node@>=12", "@types/node@>=12.0.0", "@types/node@>=13.7.0", "@types/node@^15.3.0":
+"@types/node@*", "@types/node@>=12", "@types/node@>=12.0.0", "@types/node@>=13.7.0":
   version "15.12.4"
   resolved "https://registry.npmjs.org/@types/node/-/node-15.12.4.tgz"
   integrity sha512-zrNj1+yqYF4WskCMOHwN+w9iuD12+dGm0rQ35HLl9/Ouuq52cEtd0CH9qMgrdNmi5ejC1/V7vKEXYubB+65DkA==
@@ -7497,13 +7497,12 @@ pino-lambda@2.1.0:
   resolved "https://registry.yarnpkg.com/pino-lambda/-/pino-lambda-2.1.0.tgz#59177f7b84d3554db0b0a918a7d76e49294c099f"
   integrity sha512-BVcgGlTnL5WSqTKejJOyRZgGkUJD1Z/hLm/LsL22P/sD8vuQ4ijL/SVMorCZYFXmxDxkBxHYhQe00DLMehJDDA==
 
-pino-pretty@5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/pino-pretty/-/pino-pretty-5.1.0.tgz#a7e6dcace4da4fd0d9763ff95957ebbf4b810fbb"
-  integrity sha512-fpDU80MKP59XOWxqV8crTDjRegC2fbDsA56zTr5s1guiv6QuYHILc9x1a4+o9SNPtfmF2kQdpAZS+bIExtbELQ==
+pino-pretty@5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/pino-pretty/-/pino-pretty-5.1.1.tgz#387aebbe0c4504b9e3f6f51148e36d1b336cb16d"
+  integrity sha512-bG8a6A2QcZYJXD/ZL7PXn8CDNIUP5TKyQwR9Yjzn5dpGyQ7Wbyl707Dxhx+tPT3BG6YpsXF93Hhe9EUnx0SsPw==
   dependencies:
     "@hapi/bourne" "^2.0.0"
-    "@types/node" "^15.3.0"
     args "^5.0.1"
     chalk "^4.0.0"
     dateformat "^4.5.1"
@@ -8222,10 +8221,10 @@ serverless-dynamodb-local@0.2.40:
     dynamodb-localhost "0.0.9"
     lodash "^4.17.0"
 
-serverless-esbuild@1.16.0:
-  version "1.16.0"
-  resolved "https://registry.yarnpkg.com/serverless-esbuild/-/serverless-esbuild-1.16.0.tgz#cf05ef4b924ba44664750db4cabdbfcbf2e04f95"
-  integrity sha512-9jM4e6gUQ8SJV4jXgdpg1niw9cVF+8rQiW8lwCr2iq8bqXFw9cMOjzNWp4A5SAhcwVvNr0642qxJ0njrrjDPMg==
+serverless-esbuild@1.16.1:
+  version "1.16.1"
+  resolved "https://registry.yarnpkg.com/serverless-esbuild/-/serverless-esbuild-1.16.1.tgz#2669a5ecf6a7c05264269b9756df47352f5fb77f"
+  integrity sha512-JEV+7FKb5MRh2CXp/50iSQ1G9v/k0CahEA1bXJ3aU1kuowda3RS5f8W5yz3kGwRtf6nbZQnbLdbdBa9MR2963A==
   dependencies:
     bestzip "^2.2.0"
     chokidar "^3.4.3"
