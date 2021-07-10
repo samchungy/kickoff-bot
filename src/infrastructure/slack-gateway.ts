@@ -1,3 +1,5 @@
+
+import {post} from 'infrastructure/http-gateway';
 import {ErrorCode, View, WebAPIHTTPError, WebAPIPlatformError, WebClient} from '@slack/web-api';
 import {logger} from 'lib';
 import {config} from 'config';
@@ -85,4 +87,10 @@ const deleteMessage = async (sendTo: string, ts: string) => await handleCall(() 
   token: config.slack.token,
 }), 'delete message');
 
-export {deleteMessage, deleteScheduledMessage, fetchUserInfo, openModal, sendEphemeralMessage, updateModal, sendMessage, scheduleMessage};
+const respond = async (responseUrl: string, text: string) => await post(responseUrl, {
+  text,
+  response_type: 'ephemeral',
+  replace_original: false,
+});
+
+export {deleteMessage, deleteScheduledMessage, fetchUserInfo, openModal, sendEphemeralMessage, updateModal, sendMessage, scheduleMessage, respond};
