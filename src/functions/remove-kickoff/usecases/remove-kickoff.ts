@@ -15,7 +15,7 @@ const removeKickoff = async (event: RemoveKickoffEvent) => {
 
     const kickoff = await getKickoff(event.channelId, event.ts);
 
-    if (kickoff && new Date().getTime() / 1000 > kickoff.eventTime) {
+    if (kickoff && kickoff.eventTime < new Date().getTime() / 1000) {
       await Promise.all(Object.entries(kickoff.users).map(([user, messageId]) =>
         Promise.all([
           deleteScheduledMessage(user, messageId),
