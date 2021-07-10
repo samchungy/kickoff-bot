@@ -8,7 +8,8 @@
     "local:dynamodb": "npx dotenv-cli -c local -- npx sls dynamodb install",
     "local:sls-offline": "cd node_modules/serverless-offline && yarn",
     "local": "npx dotenv-cli -c local -- npx sls offline start -s local",
-    "deploy": "npx sls deploy"
+    "package": "npx sls package --stage production",
+    "deploy": "npx sls deploy --stage production"
   },
   "author": "",
   "license": "ISC",
