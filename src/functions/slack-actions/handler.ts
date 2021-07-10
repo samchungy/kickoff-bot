@@ -2,8 +2,8 @@ import {logger} from 'lib';
 import {slackAuthenticate} from 'lib/slack/authoriser';
 import {APIGatewayEvent, APIGatewayProxyHandler} from 'aws-lambda';
 
-import {viewSubmissionHandler} from './view-submission';
-import {blockActionsHandler} from './block-actions';
+import {viewSubmissionHandler} from './view-submission-handler';
+import {blockActionsHandler} from './block-actions-handler';
 import {SlackBlockAction, SlackViewAction} from 'domain/slack';
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayEvent, context) => {
