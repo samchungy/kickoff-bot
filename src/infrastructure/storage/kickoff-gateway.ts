@@ -12,7 +12,11 @@ const createHashRangeKey = (channelId: string, ts: string): HashRangeKey => ({
   rangeKey: createRangeKey(ts),
 });
 
-const putKickoff = async (item: Kickoff) => {
+const putKickoff = async (channelId: string, ts: string, kickoff: Kickoff) => {
+  const item: KickoffRecord = {
+    ...createHashRangeKey(channelId, ts),
+    ...kickoff,
+  };
   await client.send(new PutCommand({
     Item: item,
     TableName: config.dynamodb.tableName,

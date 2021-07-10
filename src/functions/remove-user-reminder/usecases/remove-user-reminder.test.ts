@@ -21,6 +21,8 @@ const userReminderEvent: UserReminderEvent = {
 const createKickoffRecord = (users: KickoffRecord['users'], eventTime: number): KickoffRecord => ({
   hashKey: 'channel-C025RNKNB28',
   rangeKey: 'timestamp-1458170866.000004',
+  ts: '1458170866.000004',
+  channelId: 'C025RNKNB28',
   author: 'URVUTD7UP',
   users,
   domain: 'spotbottest',

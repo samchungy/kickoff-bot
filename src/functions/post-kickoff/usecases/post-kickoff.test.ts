@@ -74,6 +74,8 @@ it('should call the slack interface to create an new post', async () => {
 
 it('should call the kickoff interface to store the kickoff metadata', async () => {
   const expectedItem: Kickoff = ({
+    channelId: kickoffEvent.values.channelId,
+    ts: samplePostMessageResponse.ts as string,
     author: kickoffEvent.userId,
     domain: kickoffEvent.metadata.domain,
     eventTime: 1611826200,
@@ -82,7 +84,7 @@ it('should call the kickoff interface to store the kickoff metadata', async () =
 
   await expect(postKickoff(kickoffEvent)).resolves.toBeUndefined();
 
-  expect(putKickoff).toBeCalledWith(expectedItem);
+  expect(putKickoff).toBeCalledWith(expectedItem.channelId, expectedItem.ts, expectedItem);
 });
 
 it('should call to async invoke the add user reminder function', async () => {

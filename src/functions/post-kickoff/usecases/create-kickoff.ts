@@ -1,10 +1,12 @@
 import {KickoffEvent} from 'domain/events';
 import {Kickoff} from 'domain/kickoff';
 
-const createKickoff = (event: KickoffEvent, ts: string, userId: string, time: number): Kickoff => ({
+const createKickoff = (event: KickoffEvent, ts: string, time: number): Kickoff => ({
+  channelId: event.values.channelId,
+  ts,
   domain: event.metadata.domain,
   eventTime: time,
-  author: userId,
+  author: event.userId,
   users: {},
 });
 

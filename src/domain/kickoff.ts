@@ -3,6 +3,8 @@ import {SlackBlockWithAction} from './slack';
 type UserScheduledMessage = Record<string, string>
 
 interface Kickoff {
+  channelId: string
+  ts: string
   eventTime: number
   domain: string
   author: string

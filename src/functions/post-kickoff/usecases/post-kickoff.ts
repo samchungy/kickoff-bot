@@ -99,8 +99,8 @@ const createSlackPost = async (event: KickoffEvent) => {
 
 const storeKickoff = async (event: KickoffEvent, metadata: ChatPostMessageResponse) => {
   const time = zonedTimeToUtc(`${event.values.date} ${event.values.time}`, event.metadata.timezone).getTime() / 1000;
-  const kickoff = createKickoff(event, metadata.ts as string, event.userId, time);
-  await putKickoff(kickoff);
+  const kickoff = createKickoff(event, metadata.ts as string, time);
+  await putKickoff(event.values.channelId, metadata.ts as string, kickoff);
 };
 
 const postKickoff = async (event: KickoffEvent) => {
