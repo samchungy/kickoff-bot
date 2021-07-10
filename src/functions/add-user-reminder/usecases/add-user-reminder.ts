@@ -41,7 +41,7 @@ const addUserReminder = async (event: UserReminderEvent) => {
     const kickoff = await getKickoff(event.channelId, event.ts);
     const currentTime = new Date().getTime() / 1000;
 
-    if (!kickoff || kickoff.users[event.userId] || kickoff.eventTime > currentTime) {
+    if (!kickoff || kickoff.users[event.userId] || kickoff.eventTime < currentTime) {
       logger.info({kickoff}, 'No kickoff, kickoff has expired or user already exists');
       return;
     }

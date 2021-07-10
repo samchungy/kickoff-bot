@@ -30,8 +30,8 @@ const createKickoffRecord = (users: KickoffRecord['users'], eventTime: number): 
 });
 
 const kickoffUsers = {URVUTD7UP: 'Q1298393284'};
-const beforeCurrentTime = 1609459000;
-const sampleKickoff = createKickoffRecord(kickoffUsers, beforeCurrentTime);
+const afterCurrentTime = 1609459800;
+const sampleKickoff = createKickoffRecord(kickoffUsers, afterCurrentTime);
 
 const deleteScheduledMessageResponse: ChatDeleteScheduledMessageResponse = {
   ok: true,
@@ -69,7 +69,7 @@ it('should return when kickoff returns nothing', async () => {
 
 it('should return when kickoff has no user', async () => {
   const noKickoffUsers = {};
-  const kickoff = createKickoffRecord(noKickoffUsers, beforeCurrentTime);
+  const kickoff = createKickoffRecord(noKickoffUsers, afterCurrentTime);
   mocked(getKickoff).mockResolvedValue(kickoff);
   await expect(removeUserReminder(userReminderEvent)).resolves.toBeUndefined();
 
@@ -77,8 +77,8 @@ it('should return when kickoff has no user', async () => {
 });
 
 it('should return when kickoff is already expired', async () => {
-  const expiredTime = 1609459400;
-  const kickoff = createKickoffRecord(kickoffUsers, expiredTime);
+  const beforeCurrentTime = 1609459000;
+  const kickoff = createKickoffRecord(kickoffUsers, beforeCurrentTime);
   mocked(getKickoff).mockResolvedValue(kickoff);
   await expect(removeUserReminder(userReminderEvent)).resolves.toBeUndefined();
 

@@ -30,8 +30,8 @@ const createKickoffRecord = (users: KickoffRecord['users'], eventTime: number): 
   eventTime,
 });
 
-const beforeCurrentTime = 1609459000;
-const sampleKickoff = createKickoffRecord({}, beforeCurrentTime);
+const afterCurrentTime = 1609459800;
+const sampleKickoff = createKickoffRecord({}, afterCurrentTime);
 
 const deleteScheduledMessageResponse: ChatDeleteScheduledMessageResponse = {
   ok: true,
@@ -82,7 +82,7 @@ it('should return when the kickoff no longer exists', async () => {
 });
 
 it('should return when the kickoff already has the user', async () => {
-  mocked(getKickoff).mockResolvedValue(createKickoffRecord({[userReminderEvent.userId]: 'Q1298393284'}, beforeCurrentTime));
+  mocked(getKickoff).mockResolvedValue(createKickoffRecord({[userReminderEvent.userId]: 'Q1298393284'}, afterCurrentTime));
   await expect(addUserReminder(userReminderEvent)).resolves.toBeUndefined();
 
   expect(getKickoff).toBeCalledWith(userReminderEvent.channelId, userReminderEvent.ts);
@@ -90,7 +90,7 @@ it('should return when the kickoff already has the user', async () => {
 });
 
 it('should return when the kickoff is expired', async () => {
-  mocked(getKickoff).mockResolvedValue(createKickoffRecord({}, 1609459600));
+  mocked(getKickoff).mockResolvedValue(createKickoffRecord({}, 1609459000));
   await expect(addUserReminder(userReminderEvent)).resolves.toBeUndefined();
 
   expect(getKickoff).toBeCalledWith(userReminderEvent.channelId, userReminderEvent.ts);
