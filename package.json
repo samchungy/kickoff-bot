@@ -10,7 +10,7 @@
     "local:sls-offline": "cd node_modules/serverless-offline && yarn",
     "local": "npx dotenv-cli -c local -- npx sls offline start -s local",
     "package": "npx sls package --stage production",
-    "test": "TZ=UTC jest --coverage",
+    "test": "TZ=UTC jest --coverage"
   },
   "author": "",
   "license": "ISC",
