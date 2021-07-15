@@ -23,15 +23,11 @@ jobs:
     - name: Install Dependencies
       run: yarn
 
+    - name: Run Linter
+      run: yarn lint
+
     - name: Run Unit Tests
       run: yarn test
-
-    - name: Package
-      env:
-        NODE_ENV: ${{ env.NODE_ENV }}
-        SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-        SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
-      run: yarn package
 
   # deploy:
   #   needs: [build]
