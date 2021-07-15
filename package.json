@@ -27,7 +27,7 @@
     "esbuild": "0.12.15",
     "eslint": "7.30.0",
     "eslint-config-xo": "0.37.0",
-    "inquirer": "8.1.1",
+    "inquirer": "8.1.2",
     "jest": "27.0.6",
     "pino-pretty": "5.1.1",
     "serverless": "2.51.2",
