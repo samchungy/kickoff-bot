@@ -24,7 +24,7 @@
     "@typescript-eslint/eslint-plugin": "4.28.4",
     "@typescript-eslint/parser": "4.28.4",
     "dotenv-cli": "4.0.0",
-    "esbuild": "0.12.15",
+    "esbuild": "0.12.22",
     "eslint": "7.32.0",
     "eslint-config-xo": "0.37.0",
     "inquirer": "8.1.2",
