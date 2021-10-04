@@ -7566,10 +7566,10 @@ pinkie@^2.0.0:
   resolved "https://registry.npmjs.org/pinkie/-/pinkie-2.0.4.tgz"
   integrity sha1-clVrgM+g1IqXToDnckjoDtT3+HA=
 
-pino-lambda@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/pino-lambda/-/pino-lambda-2.1.0.tgz#59177f7b84d3554db0b0a918a7d76e49294c099f"
-  integrity sha512-BVcgGlTnL5WSqTKejJOyRZgGkUJD1Z/hLm/LsL22P/sD8vuQ4ijL/SVMorCZYFXmxDxkBxHYhQe00DLMehJDDA==
+pino-lambda@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/pino-lambda/-/pino-lambda-3.0.0.tgz#6e022690d2b1962753a8bc2fb007e02f17462b98"
+  integrity sha512-0L+8OefO89XT3NMeKTSP4Wq1M+uTKjIxwp4ejcBEfLtXN3K4pfhhL1H+2kAk36Z0gTSHfSkZNzV2XISMQdO0Fg==
 
 pino-pretty@6.0.0:
   version "6.0.0"
