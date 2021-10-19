@@ -20,7 +20,7 @@
     "@slack/types": "2.1.0",
     "@types/aws-lambda": "8.10.83",
     "@types/jest": "27.0.1",
-    "@types/pino": "6.3.11",
+    "@types/pino": "6.3.12",
     "@typescript-eslint/eslint-plugin": "4.29.3",
     "@typescript-eslint/parser": "4.29.3",
     "dotenv-cli": "4.0.0",
@@ -46,7 +46,7 @@
     "@slack/web-api": "6.4.0",
     "date-fns": "2.23.0",
     "date-fns-tz": "1.1.6",
-    "pino": "6.13.1",
+    "pino": "6.13.3",
     "pino-lambda": "2.1.0"
   }
 }
